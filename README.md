@@ -4,6 +4,7 @@
 - [Environment for development](#environment-for-development)
   - [Mysql](#mysql)
   - [Service](#service)
+    - [Database migration](#database-migration)
 - [Contributors](#contributors)
 
 
@@ -20,10 +21,20 @@
 ./scripts/run-docker-mysql-dev.sh
 ```
 ## Service
+- Download tools for service
+```
+make init
+```
 - Run service with the make command
 ```
 make run-standalone-server
 ```
+### Database migration
+- Add a new schema for database
+```
+make migrate-new <name_of_new_schema>
+```
+
 
 # Contributors
 |  Fullname   | Startdate  |
