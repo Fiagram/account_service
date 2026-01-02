@@ -1,9 +1,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/Fiagram/account_service/internal/app"
 	"github.com/Fiagram/account_service/internal/configs"
 	"github.com/Fiagram/account_service/internal/dataaccess/database"
@@ -28,13 +25,6 @@ func InitStandaloneServer(configFilePath string) (app.StandaloneServer, func(), 
 		loggerCleanup()
 		return nil, nil, err
 	}
-
-	arAccessor := database.NewAccountRole(db, logger)
-	ar1, err := arAccessor.GetIdByName(context.Background(), "admin")
-	if err != nil {
-		fmt.Println("Thai dep trai loi roi")
-	}
-	fmt.Println("=== account row", ar1)
 
 	hashLogic := logic.NewHash(config.Auth.Hash)
 	accountLogic := logic.NewAccount(hashLogic)

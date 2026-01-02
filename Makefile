@@ -86,7 +86,6 @@ docker-compose-down-dev:
 .PHONY: run-standalone-server
 run-standalone-server:
 	go run cmd/$(PROJECT_NAME)/*.go
- 
 
 .PHONY: tidy
 tidy:
@@ -95,6 +94,10 @@ tidy:
 .PHONY: vendor
 vendor:
 	go mod vendor
+
+.PHONY: test
+test:
+	go test -v ./test/dataaccess/database/
 
 .PHONY: lint
 lint:
