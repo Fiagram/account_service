@@ -38,8 +38,11 @@ func (a accountRoleAccessor) GetRoleById(
 	ctx context.Context,
 	id uint8,
 ) (AccountRole, error) {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_id", id))
+	if id == 0 {
+		return AccountRole{}, fmt.Errorf("lack of information")
+	}
 
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_id", id))
 	query := fmt.Sprintf(`SELECT id, name FROM account_role WHERE id = %d`, id)
 	row := a.exec.QueryRowContext(ctx, query)
 
@@ -57,8 +60,11 @@ func (a accountRoleAccessor) GetRoleByName(
 	ctx context.Context,
 	name string,
 ) (AccountRole, error) {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_name", name))
+	if name == "" {
+		return AccountRole{}, fmt.Errorf("lack of information")
+	}
 
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_name", name))
 	query := fmt.Sprintf(`SELECT id, name FROM account_role WHERE name = "%s"`, name)
 	row := a.exec.QueryRowContext(ctx, query)
 

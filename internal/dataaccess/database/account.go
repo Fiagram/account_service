@@ -54,8 +54,12 @@ func (a accountAccessor) CreateAccount(
 	ctx context.Context,
 	acc Account,
 ) (uint64, error) {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
+	if acc.Username == "" &&
+		acc.RoleId == 0 {
+		return 0, fmt.Errorf("lack of information")
+	}
 
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
 	query := fmt.Sprintf(`INSERT INTO accounts 
 			(username, fullname, email, phone_number, role_id)
 			VALUES ("%s", "%s", "%s", "%s", "%d")`,
@@ -68,6 +72,12 @@ func (a accountAccessor) CreateAccount(
 	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to create account")
+		return 0, err
+	}
+
+	rowEfNum, err := result.RowsAffected()
+	if rowEfNum != 1 && err != nil {
+		logger.With(zap.Error(err)).Error("failed to effect row")
 		return 0, err
 	}
 
@@ -84,8 +94,11 @@ func (a accountAccessor) GetAccountById(
 	ctx context.Context,
 	id uint64,
 ) (Account, error) {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
+	if id == 0 {
+		return Account{}, fmt.Errorf("lack of information")
+	}
 
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
 	query := fmt.Sprintf(`SELECT * FROM accounts 
 			WHERE id = "%d"`, id)
 	row := a.exec.QueryRowContext(ctx, query)
@@ -111,8 +124,11 @@ func (a accountAccessor) GetAccountByUsername(
 	ctx context.Context,
 	username string,
 ) (Account, error) {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_username", username))
+	if username == "" {
+		return Account{}, fmt.Errorf("lack of information")
+	}
 
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_username", username))
 	query := fmt.Sprintf(`SELECT * FROM accounts 
 			WHERE username = "%s"`, username)
 	row := a.exec.QueryRowContext(ctx, query)
@@ -138,14 +154,25 @@ func (a accountAccessor) DeleteAccountById(
 	ctx context.Context,
 	id uint64,
 ) error {
+	if id == 0 {
+		return fmt.Errorf("lack of information")
+	}
+
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
 	query := fmt.Sprintf(`DELETE FROM accounts 
 			WHERE id = "%d"`, id)
-	_, err := a.exec.ExecContext(ctx, query)
+	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
-		logger.With(zap.Error(err)).Error("failed to delete account by id")
+		logger.With(zap.Error(err)).Error("failed to delete account")
 		return err
 	}
+
+	rowEfNum, err := result.RowsAffected()
+	if rowEfNum != 1 && err != nil {
+		logger.With(zap.Error(err)).Error("failed to effect row")
+		return err
+	}
+
 	return nil
 }
 
@@ -153,14 +180,25 @@ func (a accountAccessor) DeleteAccountByUsername(
 	ctx context.Context,
 	username string,
 ) error {
+	if username == "" {
+		return fmt.Errorf("lack of information")
+	}
+
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_username", username))
 	query := fmt.Sprintf(`DELETE FROM accounts 
 			WHERE username = "%s"`, username)
-	_, err := a.exec.ExecContext(ctx, query)
+	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
-		logger.With(zap.Error(err)).Error("failed to delete account by username")
+		logger.With(zap.Error(err)).Error("failed to delete account")
 		return err
 	}
+
+	rowEfNum, err := result.RowsAffected()
+	if rowEfNum != 1 && err != nil {
+		logger.With(zap.Error(err)).Error("failed to effect row")
+		return err
+	}
+
 	return nil
 }
 
@@ -168,10 +206,11 @@ func (a accountAccessor) UpdateAccount(
 	ctx context.Context,
 	acc Account,
 ) error {
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
 	if acc.Username == "" {
 		return fmt.Errorf("lack of information")
 	}
+
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
 	query := fmt.Sprintf(`
 			UPDATE accounts SET 
 			fullname = "%s", 
@@ -193,20 +232,19 @@ func (a accountAccessor) UpdateAccount(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 {
+	if rowEfNum != 1 && err != nil {
 		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
-	}
-	if err != nil {
-		logger.With(zap.Error(err)).Error("failed to get last inserted id")
 		return err
 	}
 
 	return nil
 }
 
-func (a accountAccessor) WithExecutor(exec Executor) AccountAccessor {
+func (a accountAccessor) WithExecutor(
+	exec Executor,
+) AccountAccessor {
 	return &accountAccessor{
-		exec: exec,
+		exec:   exec,
+		logger: a.logger,
 	}
 }

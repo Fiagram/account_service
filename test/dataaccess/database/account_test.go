@@ -2,10 +2,7 @@ package database_test
 
 import (
 	"context"
-	"math/rand"
-	"strings"
 	"testing"
-	"time"
 
 	"github.com/Fiagram/account_service/internal/dataaccess/database"
 	"github.com/stretchr/testify/require"
@@ -13,13 +10,7 @@ import (
 
 func TestCreateAccount(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	input := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: "+84 123456789",
-		RoleId:      1,
-	}
+	input := RandomAccount()
 	id, err := asor.CreateAccount(context.Background(), input)
 
 	require.NoError(t, err)
@@ -32,13 +23,7 @@ func TestCreateAccount(t *testing.T) {
 
 func TestGetAccountById(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	input := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: randomVnPhoneNum(),
-		RoleId:      2,
-	}
+	input := RandomAccount()
 	id, err := asor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
@@ -58,13 +43,7 @@ func TestGetAccountById(t *testing.T) {
 
 func TestGetAccountByUsername(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	input := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: randomVnPhoneNum(),
-		RoleId:      2,
-	}
+	input := RandomAccount()
 	id, err := asor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
@@ -84,13 +63,7 @@ func TestGetAccountByUsername(t *testing.T) {
 
 func TestDeleteAccountById(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	input := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: randomVnPhoneNum(),
-		RoleId:      2,
-	}
+	input := RandomAccount()
 	id, err := asor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
@@ -101,13 +74,7 @@ func TestDeleteAccountById(t *testing.T) {
 
 func TestDeleteAccountByUsername(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	input := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: randomVnPhoneNum(),
-		RoleId:      2,
-	}
+	input := RandomAccount()
 	id, err := asor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
@@ -118,22 +85,16 @@ func TestDeleteAccountByUsername(t *testing.T) {
 
 func TestUpdateAccount(t *testing.T) {
 	asor := database.NewAccountAccessor(sqlDb, logger)
-	in1 := database.Account{
-		Username:    randomString(10),
-		Fullname:    randomVnPersonName(),
-		Email:       randomString(10) + "@gmail.com",
-		PhoneNumber: randomVnPhoneNum(),
-		RoleId:      2,
-	}
+	in1 := RandomAccount()
 	id1, err1 := asor.CreateAccount(context.Background(), in1)
 	require.NoError(t, err1)
 	require.NotEmpty(t, id1)
 	require.NotZero(t, id1)
 
 	in2 := in1
-	in2.Fullname = randomVnPersonName()
-	in2.Email = randomString(10) + "@gmail.com"
-	in2.PhoneNumber = randomVnPhoneNum()
+	in2.Fullname = RandomVnPersonName()
+	in2.Email = RandomGmailAddress()
+	in2.PhoneNumber = RandomVnPhoneNum()
 	in2.RoleId = 1
 	err2 := asor.UpdateAccount(context.Background(), in2)
 	require.NoError(t, err2)
@@ -149,53 +110,4 @@ func TestUpdateAccount(t *testing.T) {
 
 	errD := asor.DeleteAccountByUsername(context.Background(), in1.Username)
 	require.NoError(t, errD)
-}
-
-// Following functions serve account_test suit
-func randomString(length uint) string {
-	g := rand.New(rand.NewSource(time.Now().UnixNano()))
-	const alphabet = "qazwsxedcrfvtgbyhnujmikolp"
-	var sb strings.Builder
-	k := len(alphabet)
-	for i := 0; i < int(length); i++ {
-		c := alphabet[g.Intn(k)]
-		sb.WriteByte(c)
-	}
-	return strings.TrimSpace(sb.String())
-}
-
-func randomVnPersonName() string {
-	lastnames := []string{
-		"Nguyễn", "Vũ", "Trần", "Huỳnh", "Lê", "Phạm",
-		"Phan", "Hoàng", "Phùng", "Tô", "Mai", "Trương"}
-	middles := []string{
-		"Đỗ", "Đức", "Mạnh", "Thị", "Uyển", "Lâm",
-		"Văn", "Hàn", "Thùy", "Anh", "Duy", "Khánh",
-	}
-	firstnames := []string{
-		"Thế", "Tuấn", "Trung", "Hùng", "Dũng", "Tân",
-		"Hà", "Trí", "Hiếu", "Thái", "Tiến", "Ngọc",
-	}
-	g := rand.New(rand.NewSource(time.Now().UnixNano()))
-	out := make([]string, 4)
-	out = append(out, lastnames[g.Intn(len(lastnames))])
-	out = append(out, middles[g.Intn(len(middles))])
-	out = append(out, middles[g.Intn(len(middles))])
-	out = append(out, firstnames[g.Intn(len(firstnames))])
-	return strings.TrimSpace(strings.Join(out, " "))
-}
-
-func randomVnPhoneNum() string {
-	g := rand.New(rand.NewSource(time.Now().UnixNano()))
-	const nums = "0123456789"
-	var sb strings.Builder
-	k := len(nums)
-	for i := range 9 {
-		c := nums[rand.Intn(k)]
-		for c == '0' && i == 0 {
-			c = nums[g.Intn(k)]
-		}
-		sb.WriteByte(c)
-	}
-	return strings.TrimSpace("+84 " + sb.String())
 }
