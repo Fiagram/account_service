@@ -116,6 +116,41 @@ func TestDeleteAccountByUsername(t *testing.T) {
 	require.NoError(t, errD)
 }
 
+func TestUpdateAccount(t *testing.T) {
+	asor := database.NewAccountAccessor(sqlDb, logger)
+	in1 := database.Account{
+		Username:    randomString(10),
+		Fullname:    randomVnPersonName(),
+		Email:       randomString(10) + "@gmail.com",
+		PhoneNumber: randomVnPhoneNum(),
+		RoleId:      2,
+	}
+	id1, err1 := asor.CreateAccount(context.Background(), in1)
+	require.NoError(t, err1)
+	require.NotEmpty(t, id1)
+	require.NotZero(t, id1)
+
+	in2 := in1
+	in2.Fullname = randomVnPersonName()
+	in2.Email = randomString(10) + "@gmail.com"
+	in2.PhoneNumber = randomVnPhoneNum()
+	in2.RoleId = 1
+	err2 := asor.UpdateAccount(context.Background(), in2)
+	require.NoError(t, err2)
+
+	updatedAcc, errU := asor.GetAccountByUsername(context.Background(), in1.Username)
+	require.NoError(t, errU)
+	require.NotEmpty(t, updatedAcc)
+	require.Equal(t, in2.Username, updatedAcc.Username)
+	require.Equal(t, in2.Fullname, updatedAcc.Fullname)
+	require.Equal(t, in2.Email, updatedAcc.Email)
+	require.Equal(t, in2.PhoneNumber, updatedAcc.PhoneNumber)
+	require.Equal(t, in2.RoleId, updatedAcc.RoleId)
+
+	errD := asor.DeleteAccountByUsername(context.Background(), in1.Username)
+	require.NoError(t, errD)
+}
+
 // Following functions serve account_test suit
 func randomString(length uint) string {
 	g := rand.New(rand.NewSource(time.Now().UnixNano()))

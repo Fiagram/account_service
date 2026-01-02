@@ -27,7 +27,7 @@ type AccountAccessor interface {
 	GetAccountById(ctx context.Context, id uint64) (Account, error)
 	GetAccountByUsername(ctx context.Context, username string) (Account, error)
 
-	// UpdateAccount(ctx context.Context, account Account) (uint64, error)
+	UpdateAccount(ctx context.Context, account Account) error
 
 	DeleteAccountById(ctx context.Context, id uint64) error
 	DeleteAccountByUsername(ctx context.Context, username string) error
@@ -65,13 +65,13 @@ func (a accountAccessor) CreateAccount(
 		strings.TrimSpace(acc.PhoneNumber),
 		acc.RoleId)
 
-	ressult, err := a.exec.ExecContext(ctx, query)
+	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to create account")
 		return 0, err
 	}
 
-	lastInsertedId, err := ressult.LastInsertId()
+	lastInsertedId, err := result.LastInsertId()
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to get last inserted id")
 		return 0, err
@@ -161,6 +161,47 @@ func (a accountAccessor) DeleteAccountByUsername(
 		logger.With(zap.Error(err)).Error("failed to delete account by username")
 		return err
 	}
+	return nil
+}
+
+func (a accountAccessor) UpdateAccount(
+	ctx context.Context,
+	acc Account,
+) error {
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
+	if acc.Username == "" {
+		return fmt.Errorf("lack of information")
+	}
+	query := fmt.Sprintf(`
+			UPDATE accounts SET 
+			fullname = "%s", 
+			email = "%s", 
+			phone_number = "%s", 
+			role_id = "%d" 
+			WHERE username = "%s"`,
+		strings.TrimSpace(acc.Fullname),
+		strings.TrimSpace(acc.Email),
+		strings.TrimSpace(acc.PhoneNumber),
+		acc.RoleId,
+		strings.TrimSpace(acc.Username),
+	)
+
+	result, err := a.exec.ExecContext(ctx, query)
+	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to update account")
+		return err
+	}
+
+	rowEfNum, err := result.RowsAffected()
+	if rowEfNum != 1 {
+		logger.With(zap.Error(err)).Error("failed to effect row")
+		return err
+	}
+	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to get last inserted id")
+		return err
+	}
+
 	return nil
 }
 
