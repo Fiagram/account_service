@@ -25,7 +25,7 @@ func NewHandler(
 func (h Handler) CreateAccount(
 	ctx context.Context,
 	request *account_service.CreateAccountRequest,
-) (response *account_service.CreateAccountResponse, err error) {
+) (*account_service.CreateAccountResponse, error) {
 	output, err := h.accountLogic.CreateAccount(ctx,
 		logic.CreateAccountParams{
 			AccountInfo: logic.AccountInfo{
@@ -71,8 +71,20 @@ func (h Handler) UpdateAccount(context.Context,
 ) (*account_service.UpdateAccountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateAccount not implemented")
 }
-func (h Handler) DeleteAccount(context.Context,
-	*account_service.DeleteAccountRequest,
+
+func (h Handler) DeleteAccount(
+	ctx context.Context,
+	request *account_service.DeleteAccountRequest,
 ) (*account_service.DeleteAccountResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method DeleteAccount not implemented")
+	err := h.accountLogic.DeleteAccount(ctx,
+		logic.DeleteAccountParams{
+			Username: request.GetUsername(),
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.DeleteAccountResponse{
+		Username: request.GetUsername(),
+	}, nil
 }

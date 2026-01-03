@@ -629,7 +629,7 @@ func (x *UpdateAccountResponse) GetAccountId() uint64 {
 
 type DeleteAccountRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccountId     uint64                 `protobuf:"varint,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -664,16 +664,16 @@ func (*DeleteAccountRequest) Descriptor() ([]byte, []int) {
 	return file_api_account_service_account_service_proto_rawDescGZIP(), []int{11}
 }
 
-func (x *DeleteAccountRequest) GetAccountId() uint64 {
+func (x *DeleteAccountRequest) GetUsername() string {
 	if x != nil {
-		return x.AccountId
+		return x.Username
 	}
-	return 0
+	return ""
 }
 
 type DeleteAccountResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccountId     uint64                 `protobuf:"varint,1,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -708,11 +708,11 @@ func (*DeleteAccountResponse) Descriptor() ([]byte, []int) {
 	return file_api_account_service_account_service_proto_rawDescGZIP(), []int{12}
 }
 
-func (x *DeleteAccountResponse) GetAccountId() uint64 {
+func (x *DeleteAccountResponse) GetUsername() string {
 	if x != nil {
-		return x.AccountId
+		return x.Username
 	}
-	return 0
+	return ""
 }
 
 type CheckAccountValidRequest struct {
@@ -856,13 +856,11 @@ const file_api_account_service_account_service_proto_rawDesc = "" +
 	"\x14updated_account_info\x18\x02 \x01(\v2$.fiagram.account_service.AccountInfoR\x12updatedAccountInfo\"6\n" +
 	"\x15UpdateAccountResponse\x12\x1d\n" +
 	"\n" +
-	"account_id\x18\x01 \x01(\x04R\taccountId\"5\n" +
-	"\x14DeleteAccountRequest\x12\x1d\n" +
-	"\n" +
-	"account_id\x18\x01 \x01(\x04R\taccountId\"6\n" +
-	"\x15DeleteAccountResponse\x12\x1d\n" +
-	"\n" +
-	"account_id\x18\x01 \x01(\x04R\taccountId\"R\n" +
+	"account_id\x18\x01 \x01(\x04R\taccountId\"2\n" +
+	"\x14DeleteAccountRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"3\n" +
+	"\x15DeleteAccountResponse\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"R\n" +
 	"\x18CheckAccountValidRequest\x12\x1a\n" +
 	"\busername\x18\x01 \x01(\tR\busername\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\":\n" +

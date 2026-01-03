@@ -54,7 +54,7 @@ func (a account) CreateAccount(
 
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return emptyOutput, status.Error(codes.Internal, "failed to take a transaction up")
+		return emptyOutput, ErrTxInitFailed
 	}
 	defer tx.Rollback()
 
@@ -87,7 +87,7 @@ func (a account) CreateAccount(
 	}
 
 	if err = tx.Commit(); err != nil {
-		return emptyOutput, status.Error(codes.Internal, "failed to commit")
+		return emptyOutput, ErrTxCommitFailed
 	}
 
 	return CreateAccountOutput{
@@ -99,6 +99,41 @@ func (a account) DeleteAccount(
 	ctx context.Context,
 	params DeleteAccountParams,
 ) error {
+	isExisted, err := a.accountAccessor.IsUsernameTaken(ctx, params.Username)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to check if username existed")
+	} else if !isExisted {
+		return status.Error(codes.NotFound, "username does not existed")
+	}
+
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return ErrTxInitFailed
+	}
+	defer tx.Rollback()
+	acc, err := a.accountAccessor.
+		WithExecutor(tx).
+		GetAccountByUsername(ctx, params.Username)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to get account")
+	}
+	err = a.accountPasswordAccessor.
+		WithExecutor(tx).
+		DeleteAccountPassword(ctx, acc.Id)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to delete password")
+	}
+	err = a.accountAccessor.
+		WithExecutor(tx).
+		DeleteAccountById(ctx, acc.Id)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to delete account")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return ErrTxCommitFailed
+	}
+
 	return nil
 }
 
