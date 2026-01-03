@@ -86,8 +86,7 @@ func (a account) CreateAccount(
 		return emptyOutput, status.Error(codes.Internal, "failed to create new password")
 	}
 
-	err = tx.Commit()
-	if err != nil {
+	if err = tx.Commit(); err != nil {
 		return emptyOutput, status.Error(codes.Internal, "failed to commit")
 	}
 

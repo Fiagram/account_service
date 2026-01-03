@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/Fiagram/account_service/internal/utils"
 	"go.uber.org/zap"
@@ -43,8 +42,8 @@ func (a accountRoleAccessor) GetRoleById(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_id", id))
-	query := fmt.Sprintf(`SELECT id, name FROM account_role WHERE id = %d`, id)
-	row := a.exec.QueryRowContext(ctx, query)
+	const query = `SELECT id, name FROM account_role WHERE id = ?`
+	row := a.exec.QueryRowContext(ctx, query, id)
 
 	var out AccountRole
 	err := row.Scan(&out.Id, &out.Name)
@@ -65,8 +64,8 @@ func (a accountRoleAccessor) GetRoleByName(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_name", name))
-	query := fmt.Sprintf(`SELECT id, name FROM account_role WHERE name = "%s"`, name)
-	row := a.exec.QueryRowContext(ctx, query)
+	const query = `SELECT id, name FROM account_role WHERE name = ?`
+	row := a.exec.QueryRowContext(ctx, query, name)
 
 	var out AccountRole
 	err := row.Scan(&out.Id, &out.Name)

@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -62,16 +61,16 @@ func (a accountAccessor) CreateAccount(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
-	query := fmt.Sprintf(`INSERT INTO accounts 
-			(username, fullname, email, phone_number, role_id)
-			VALUES ("%s", "%s", "%s", "%s", "%d")`,
+	const query = `INSERT INTO accounts 
+			(username, fullname, email, phone_number, role_id) 
+			VALUES (?, ?, ?, ?, ?)`
+	result, err := a.exec.ExecContext(ctx, query,
 		strings.TrimSpace(acc.Username),
 		strings.TrimSpace(acc.Fullname),
 		strings.TrimSpace(acc.Email),
 		strings.TrimSpace(acc.PhoneNumber),
-		acc.RoleId)
-
-	result, err := a.exec.ExecContext(ctx, query)
+		acc.RoleId,
+	)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to create account")
 		return 0, err
@@ -101,9 +100,8 @@ func (a accountAccessor) GetAccountById(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
-	query := fmt.Sprintf(`SELECT * FROM accounts 
-			WHERE id = "%d"`, id)
-	row := a.exec.QueryRowContext(ctx, query)
+	const query = `SELECT * FROM accounts WHERE id = ?`
+	row := a.exec.QueryRowContext(ctx, query, id)
 
 	var out Account
 	err := row.Scan(&out.Id,
@@ -131,9 +129,8 @@ func (a accountAccessor) GetAccountByUsername(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("username", username))
-	query := fmt.Sprintf(`SELECT * FROM accounts 
-			WHERE username = "%s"`, username)
-	row := a.exec.QueryRowContext(ctx, query)
+	const query = `SELECT * FROM accounts WHERE username = ?`
+	row := a.exec.QueryRowContext(ctx, query, username)
 
 	var out Account
 	err := row.Scan(&out.Id,
@@ -161,9 +158,8 @@ func (a accountAccessor) DeleteAccountById(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
-	query := fmt.Sprintf(`DELETE FROM accounts 
-			WHERE id = "%d"`, id)
-	result, err := a.exec.ExecContext(ctx, query)
+	const query = `DELETE FROM accounts WHERE id = ?`
+	result, err := a.exec.ExecContext(ctx, query, id)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to delete account")
 		return err
@@ -187,9 +183,8 @@ func (a accountAccessor) DeleteAccountByUsername(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("username", username))
-	query := fmt.Sprintf(`DELETE FROM accounts 
-			WHERE username = "%s"`, username)
-	result, err := a.exec.ExecContext(ctx, query)
+	const query = `DELETE FROM accounts WHERE username = ?`
+	result, err := a.exec.ExecContext(ctx, query, username)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to delete account")
 		return err
@@ -213,21 +208,20 @@ func (a accountAccessor) UpdateAccount(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
-	query := fmt.Sprintf(`
-			UPDATE accounts SET 
-			fullname = "%s", 
-			email = "%s", 
-			phone_number = "%s", 
-			role_id = "%d" 
-			WHERE username = "%s"`,
+	const query = `UPDATE accounts SET 
+			fullname = ?, 
+			email = ?, 
+			phone_number = ?, 
+			role_id = ? 
+			WHERE username = ?`
+
+	result, err := a.exec.ExecContext(ctx, query,
 		strings.TrimSpace(acc.Fullname),
 		strings.TrimSpace(acc.Email),
 		strings.TrimSpace(acc.PhoneNumber),
 		acc.RoleId,
 		strings.TrimSpace(acc.Username),
 	)
-
-	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to update account")
 		return err

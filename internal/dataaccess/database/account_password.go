@@ -2,7 +2,6 @@ package database
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -52,14 +51,14 @@ func (a accountPasswordAccessor) CreateAccountPassword(
 	if ap.OfAccountId == 0 {
 		return ErrLackOfInfor
 	}
-	query := fmt.Sprintf(`INSERT INTO account_passwords 
+	const query = `INSERT INTO account_passwords 
 		(of_account_id, hashed_string)
-		VALUES ("%d", "%s")`,
+		VALUES (?, ?)`
+
+	result, err := a.exec.ExecContext(ctx, query,
 		ap.OfAccountId,
 		strings.TrimSpace(ap.HashedString),
 	)
-
-	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to insert account password")
 		return err
@@ -83,10 +82,8 @@ func (a accountPasswordAccessor) GetAccountPassword(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", id))
-	query := fmt.Sprintf(`SELECT * 
-			FROM account_passwords 
-			WHERE of_account_id = "%d"`, id)
-	row := a.exec.QueryRowContext(ctx, query)
+	const query = `SELECT * FROM account_passwords WHERE of_account_id = ?`
+	row := a.exec.QueryRowContext(ctx, query, id)
 	var out AccountPassword
 	err := row.Scan(&out.OfAccountId,
 		&out.HashedString,
@@ -112,9 +109,9 @@ func (a accountPasswordAccessor) DeleteAccountPassword(
 	if id == 0 {
 		return ErrLackOfInfor
 	}
-	query := fmt.Sprintf(`DELETE FROM account_passwords 
-			WHERE of_account_id = "%d"`, id)
-	result, err := a.exec.ExecContext(ctx, query)
+	const query = `DELETE FROM account_passwords 
+			WHERE of_account_id = ?`
+	result, err := a.exec.ExecContext(ctx, query, id)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to delete password")
 		return err
@@ -138,14 +135,13 @@ func (a accountPasswordAccessor) UpdateAccountPassword(
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", ap.OfAccountId))
-	query := fmt.Sprintf(`UPDATE account_passwords SET 
-			hashed_string = "%s" 
-			WHERE of_account_id = "%d"`,
+	const query = `UPDATE account_passwords SET 
+			hashed_string = ?  
+			WHERE of_account_id = ?`
+	result, err := a.exec.ExecContext(ctx, query,
 		strings.TrimSpace(ap.HashedString),
 		ap.OfAccountId,
 	)
-
-	result, err := a.exec.ExecContext(ctx, query)
 	if err != nil {
 		logger.With(zap.Error(err)).Error("failed to update password")
 		return err
