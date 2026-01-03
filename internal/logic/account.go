@@ -1,51 +1,106 @@
 package logic
 
-import "context"
+import (
+	"context"
+	"database/sql"
 
-type Role string
-
-const (
-	NoneRole   Role = "none"
-	AdminRole  Role = "admin"
-	NormalRole Role = "normal"
+	"github.com/Fiagram/account_service/internal/dataaccess/database"
+	"go.uber.org/zap"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
-
-type AccountInfo struct {
-	Username    string
-	Fullname    string
-	Email       string
-	PhoneNumber string
-	Role        Role
-}
-
-type CreateAccountParams struct {
-	AccountInfo AccountInfo
-	Password    string
-}
-
-type CreateAccountOutput struct {
-	AccountId uint64
-}
 
 type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
+	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
 	// CreateSession(ctx context.Context, params CreateSessionParams) (CreateSessionOutput, error)
 }
 
 type account struct {
-	hashLogic Hash
+	db                      *sql.DB
+	accountAccessor         database.AccountAccessor
+	accountPasswordAccessor database.AccountPasswordAccessor
+	hashLogic               Hash
+	logger                  *zap.Logger
 }
 
 func NewAccount(
+	db *sql.DB,
+	accountAccessor database.AccountAccessor,
+	accountPasswordAccessor database.AccountPasswordAccessor,
 	hashLogic Hash,
+	logger *zap.Logger,
 ) Account {
 	return &account{
-		hashLogic}
+		db:                      db,
+		accountAccessor:         accountAccessor,
+		accountPasswordAccessor: accountPasswordAccessor,
+		hashLogic:               hashLogic,
+		logger:                  logger,
+	}
 }
 
-func (a *account) CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error) {
-	// tx, err :=
-	return CreateAccountOutput{}, nil
+func (a account) CreateAccount(
+	ctx context.Context,
+	params CreateAccountParams,
+) (CreateAccountOutput, error) {
+	emptyOutput := CreateAccountOutput{}
+	isUsernameTaken, err := a.accountAccessor.IsUsernameTaken(ctx, params.AccountInfo.Username)
+	if err != nil {
+		return emptyOutput, status.Error(codes.Internal, "failed to check if username taken")
+	} else if isUsernameTaken {
+		return emptyOutput, status.Error(codes.AlreadyExists, "username has already taken")
+	}
+
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return emptyOutput, status.Error(codes.Internal, "failed to take a transaction up")
+	}
+	defer tx.Rollback()
+
+	id, err := a.accountAccessor.
+		WithExecutor(tx).
+		CreateAccount(ctx, database.Account{
+			Username:    params.AccountInfo.Username,
+			Fullname:    params.AccountInfo.Fullname,
+			Email:       params.AccountInfo.Email,
+			PhoneNumber: params.AccountInfo.PhoneNumber,
+			RoleId:      uint8(params.AccountInfo.Role),
+		})
+	if err != nil {
+		return emptyOutput, status.Error(codes.Internal, "failed to create new account")
+	}
+
+	hashedString, err := a.hashLogic.Hash(ctx, params.Password)
+	if err != nil {
+		return emptyOutput, err
+	}
+
+	err = a.accountPasswordAccessor.
+		WithExecutor(tx).
+		CreateAccountPassword(ctx, database.AccountPassword{
+			OfAccountId:  id,
+			HashedString: hashedString,
+		})
+	if err != nil {
+		return emptyOutput, status.Error(codes.Internal, "failed to create new password")
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		return emptyOutput, status.Error(codes.Internal, "failed to commit")
+	}
+
+	return CreateAccountOutput{
+		AccountId: id,
+	}, nil
+}
+
+func (a account) DeleteAccount(
+	ctx context.Context,
+	params DeleteAccountParams,
+) error {
+	return nil
 }
 
 // func (a *account) CreateSession(ctx context.Context, params CreateSessionParams) (CreateSessionOutput, error) {

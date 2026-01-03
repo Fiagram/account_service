@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/Fiagram/account_service/internal/configs"
@@ -10,6 +11,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql" // Import MySQL driver
 )
+
+var ErrLackOfInfor = errors.New("lack of information")
 
 type Executor interface {
 	Exec(query string, args ...any) (sql.Result, error)

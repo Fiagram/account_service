@@ -13,6 +13,8 @@
 
 # Todo list
 - [x] Integrate mock framework for automation testing
+- [ ] Validate input to grpc server by extended protobuf package
+- [ ] Fixbug SQL injection when querying database directly
 
 # Introduction
 - A microservice for managing accounts belongs to Fiagram project.

@@ -45,12 +45,12 @@ func (a accountPasswordAccessor) CreateAccountPassword(
 	ap AccountPassword,
 ) error {
 	if ap.OfAccountId == 0 {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", ap.OfAccountId))
 	if ap.OfAccountId == 0 {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 	query := fmt.Sprintf(`INSERT INTO account_passwords 
 		(of_account_id, hashed_string)
@@ -79,7 +79,7 @@ func (a accountPasswordAccessor) GetAccountPassword(
 	id uint64,
 ) (AccountPassword, error) {
 	if id == 0 {
-		return AccountPassword{}, fmt.Errorf("lack of information")
+		return AccountPassword{}, ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", id))
@@ -105,12 +105,12 @@ func (a accountPasswordAccessor) DeleteAccountPassword(
 	id uint64,
 ) error {
 	if id == 0 {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", id))
 	if id == 0 {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 	query := fmt.Sprintf(`DELETE FROM account_passwords 
 			WHERE of_account_id = "%d"`, id)
@@ -134,7 +134,7 @@ func (a accountPasswordAccessor) UpdateAccountPassword(
 	ap AccountPassword,
 ) error {
 	if ap.OfAccountId == 0 && ap.HashedString == "" {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("of_account_id", ap.OfAccountId))

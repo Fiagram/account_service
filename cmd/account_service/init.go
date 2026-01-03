@@ -26,8 +26,10 @@ func InitStandaloneServer(configFilePath string) (app.StandaloneServer, func(), 
 		return nil, nil, err
 	}
 
+	aAsor := database.NewAccountAccessor(db, logger)
+	apAsor := database.NewAccountPasswordAccessor(db, logger)
 	hashLogic := logic.NewHash(config.Auth.Hash)
-	accountLogic := logic.NewAccount(hashLogic)
+	accountLogic := logic.NewAccount(db, aAsor, apAsor, hashLogic, logger)
 
 	accountHandler := grpc.NewHandler(accountLogic)
 	grpcServer := grpc.NewServer(accountHandler)

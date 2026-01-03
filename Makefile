@@ -74,6 +74,8 @@ build:
 .PHONY: clean
 clean:
 	rm -rf build/
+	go clean -cache
+	go clean -testcache
 
 .PHONY: docker-compose-up-dev
 docker-compose-up-dev:
@@ -97,7 +99,8 @@ vendor:
 
 .PHONY: test
 test:
-	go test -v ./test/dataaccess/database/
+	go test -v ./test/dataaccess/database/ \
+				./test/logic/
 
 .PHONY: lint
 lint:

@@ -39,7 +39,7 @@ func (a accountRoleAccessor) GetRoleById(
 	id uint8,
 ) (AccountRole, error) {
 	if id == 0 {
-		return AccountRole{}, fmt.Errorf("lack of information")
+		return AccountRole{}, ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_id", id))
@@ -61,7 +61,7 @@ func (a accountRoleAccessor) GetRoleByName(
 	name string,
 ) (AccountRole, error) {
 	if name == "" {
-		return AccountRole{}, fmt.Errorf("lack of information")
+		return AccountRole{}, ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("role_name", name))

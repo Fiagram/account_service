@@ -24,20 +24,19 @@ func NewHandler(
 
 func (h Handler) CreateAccount(
 	ctx context.Context,
-	request *account_service.CreateAccountRequest) (
-	response *account_service.CreateAccountResponse,
-	err error,
-) {
-	output, err := h.accountLogic.CreateAccount(ctx, logic.CreateAccountParams{
-		AccountInfo: logic.AccountInfo{
-			Username:    request.GetAccountInfo().GetUsername(),
-			Fullname:    request.GetAccountInfo().GetFullname(),
-			Email:       request.GetAccountInfo().GetEmail(),
-			PhoneNumber: request.GetAccountInfo().GetPhoneNumber(),
-			Role:        logic.Role(request.GetAccountInfo().GetRole()),
-		},
-		Password: request.GetPassword(),
-	})
+	request *account_service.CreateAccountRequest,
+) (response *account_service.CreateAccountResponse, err error) {
+	output, err := h.accountLogic.CreateAccount(ctx,
+		logic.CreateAccountParams{
+			AccountInfo: logic.AccountInfo{
+				Username:    request.GetAccountInfo().GetUsername(),
+				Fullname:    request.GetAccountInfo().GetFullname(),
+				Email:       request.GetAccountInfo().GetEmail(),
+				PhoneNumber: request.GetAccountInfo().GetPhoneNumber(),
+				Role:        logic.Role(request.GetAccountInfo().GetRole()),
+			},
+			Password: request.GetPassword(),
+		})
 	if err != nil {
 		return nil, err
 	}

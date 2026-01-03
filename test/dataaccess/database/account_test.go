@@ -9,26 +9,26 @@ import (
 )
 
 func TestCreateAccount(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	input := RandomAccount()
-	id, err := asor.CreateAccount(context.Background(), input)
+	id, err := aAsor.CreateAccount(context.Background(), input)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 	require.NotZero(t, id)
 
-	errD := asor.DeleteAccountByUsername(context.Background(), input.Username)
+	errD := aAsor.DeleteAccountByUsername(context.Background(), input.Username)
 	require.NoError(t, errD)
 }
 
 func TestGetAccountById(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	input := RandomAccount()
-	id, err := asor.CreateAccount(context.Background(), input)
+	id, err := aAsor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	acc, err := asor.GetAccountById(context.Background(), id)
+	acc, err := aAsor.GetAccountById(context.Background(), id)
 	require.NoError(t, err)
 	require.NotEmpty(t, acc)
 	require.Equal(t, input.Username, acc.Username)
@@ -37,18 +37,18 @@ func TestGetAccountById(t *testing.T) {
 	require.Equal(t, input.PhoneNumber, acc.PhoneNumber)
 	require.Equal(t, input.RoleId, acc.RoleId)
 
-	errD := asor.DeleteAccountByUsername(context.Background(), input.Username)
+	errD := aAsor.DeleteAccountByUsername(context.Background(), input.Username)
 	require.NoError(t, errD)
 }
 
 func TestGetAccountByUsername(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	input := RandomAccount()
-	id, err := asor.CreateAccount(context.Background(), input)
+	id, err := aAsor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	acc, err := asor.GetAccountByUsername(context.Background(), input.Username)
+	acc, err := aAsor.GetAccountByUsername(context.Background(), input.Username)
 	require.NoError(t, err)
 	require.NotEmpty(t, acc)
 	require.Equal(t, input.Username, acc.Username)
@@ -57,36 +57,36 @@ func TestGetAccountByUsername(t *testing.T) {
 	require.Equal(t, input.PhoneNumber, acc.PhoneNumber)
 	require.Equal(t, input.RoleId, acc.RoleId)
 
-	errD := asor.DeleteAccountByUsername(context.Background(), input.Username)
+	errD := aAsor.DeleteAccountByUsername(context.Background(), input.Username)
 	require.NoError(t, errD)
 }
 
 func TestDeleteAccountById(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	input := RandomAccount()
-	id, err := asor.CreateAccount(context.Background(), input)
+	id, err := aAsor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	errD := asor.DeleteAccountById(context.Background(), id)
+	errD := aAsor.DeleteAccountById(context.Background(), id)
 	require.NoError(t, errD)
 }
 
 func TestDeleteAccountByUsername(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	input := RandomAccount()
-	id, err := asor.CreateAccount(context.Background(), input)
+	id, err := aAsor.CreateAccount(context.Background(), input)
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	errD := asor.DeleteAccountByUsername(context.Background(), input.Username)
+	errD := aAsor.DeleteAccountByUsername(context.Background(), input.Username)
 	require.NoError(t, errD)
 }
 
 func TestUpdateAccount(t *testing.T) {
-	asor := database.NewAccountAccessor(sqlDb, logger)
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
 	in1 := RandomAccount()
-	id1, err1 := asor.CreateAccount(context.Background(), in1)
+	id1, err1 := aAsor.CreateAccount(context.Background(), in1)
 	require.NoError(t, err1)
 	require.NotEmpty(t, id1)
 	require.NotZero(t, id1)
@@ -96,10 +96,10 @@ func TestUpdateAccount(t *testing.T) {
 	in2.Email = RandomGmailAddress()
 	in2.PhoneNumber = RandomVnPhoneNum()
 	in2.RoleId = 1
-	err2 := asor.UpdateAccount(context.Background(), in2)
+	err2 := aAsor.UpdateAccount(context.Background(), in2)
 	require.NoError(t, err2)
 
-	updatedAcc, errU := asor.GetAccountByUsername(context.Background(), in1.Username)
+	updatedAcc, errU := aAsor.GetAccountByUsername(context.Background(), in1.Username)
 	require.NoError(t, errU)
 	require.NotEmpty(t, updatedAcc)
 	require.Equal(t, in2.Username, updatedAcc.Username)
@@ -108,6 +108,28 @@ func TestUpdateAccount(t *testing.T) {
 	require.Equal(t, in2.PhoneNumber, updatedAcc.PhoneNumber)
 	require.Equal(t, in2.RoleId, updatedAcc.RoleId)
 
-	errD := asor.DeleteAccountByUsername(context.Background(), in1.Username)
+	errD := aAsor.DeleteAccountByUsername(context.Background(), in1.Username)
+	require.NoError(t, errD)
+}
+
+func TestIsUsernameTaken(t *testing.T) {
+	aAsor := database.NewAccountAccessor(sqlDb, logger)
+	ctx := context.Background()
+
+	input := RandomAccount()
+	id, err := aAsor.CreateAccount(ctx, input)
+	require.NoError(t, err)
+	require.NotEmpty(t, id)
+	require.NotZero(t, id)
+
+	isTakenTrue, err := aAsor.IsUsernameTaken(ctx, input.Username)
+	require.NoError(t, err)
+	require.Equal(t, true, isTakenTrue)
+
+	isTakenFalse, err := aAsor.IsUsernameTaken(ctx, RandomAccount().Username)
+	require.NoError(t, err)
+	require.Equal(t, false, isTakenFalse)
+
+	errD := aAsor.DeleteAccountByUsername(ctx, input.Username)
 	require.NoError(t, errD)
 }

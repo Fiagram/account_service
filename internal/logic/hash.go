@@ -28,9 +28,8 @@ func NewHash(hashConfig configs.Hash) Hash {
 func (h hash) Hash(_ context.Context, input string) (string, error) {
 	hashed, err := bcrypt.GenerateFromPassword([]byte(input), h.hashConfig.Cost)
 	if err != nil {
-		return "", status.Error(codes.Internal, "Failed to hash data")
+		return "", status.Error(codes.Internal, "failed to hash data")
 	}
-
 	return string(hashed), nil
 }
 
@@ -39,9 +38,7 @@ func (h hash) IsHashEqual(_ context.Context, input string, hashed string) (bool,
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
 			return false, nil
 		}
-
-		return false, status.Error(codes.Internal, "Failed to check if input equal hash")
+		return false, status.Error(codes.Internal, "failed to compare input")
 	}
-
 	return true, nil
 }

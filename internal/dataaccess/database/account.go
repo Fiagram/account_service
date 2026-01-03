@@ -32,6 +32,8 @@ type AccountAccessor interface {
 	DeleteAccountById(ctx context.Context, id uint64) error
 	DeleteAccountByUsername(ctx context.Context, username string) error
 
+	IsUsernameTaken(ctx context.Context, username string) (bool, error)
+
 	WithExecutor(exec Executor) AccountAccessor
 }
 
@@ -56,7 +58,7 @@ func (a accountAccessor) CreateAccount(
 ) (uint64, error) {
 	if acc.Username == "" &&
 		acc.RoleId == 0 {
-		return 0, fmt.Errorf("lack of information")
+		return 0, ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
@@ -95,7 +97,7 @@ func (a accountAccessor) GetAccountById(
 	id uint64,
 ) (Account, error) {
 	if id == 0 {
-		return Account{}, fmt.Errorf("lack of information")
+		return Account{}, ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
@@ -125,10 +127,10 @@ func (a accountAccessor) GetAccountByUsername(
 	username string,
 ) (Account, error) {
 	if username == "" {
-		return Account{}, fmt.Errorf("lack of information")
+		return Account{}, ErrLackOfInfor
 	}
 
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_username", username))
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("username", username))
 	query := fmt.Sprintf(`SELECT * FROM accounts 
 			WHERE username = "%s"`, username)
 	row := a.exec.QueryRowContext(ctx, query)
@@ -155,7 +157,7 @@ func (a accountAccessor) DeleteAccountById(
 	id uint64,
 ) error {
 	if id == 0 {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_id", id))
@@ -181,10 +183,10 @@ func (a accountAccessor) DeleteAccountByUsername(
 	username string,
 ) error {
 	if username == "" {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
-	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account_username", username))
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("username", username))
 	query := fmt.Sprintf(`DELETE FROM accounts 
 			WHERE username = "%s"`, username)
 	result, err := a.exec.ExecContext(ctx, query)
@@ -207,7 +209,7 @@ func (a accountAccessor) UpdateAccount(
 	acc Account,
 ) error {
 	if acc.Username == "" {
-		return fmt.Errorf("lack of information")
+		return ErrLackOfInfor
 	}
 
 	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("account", acc))
@@ -238,6 +240,29 @@ func (a accountAccessor) UpdateAccount(
 	}
 
 	return nil
+}
+
+func (a accountAccessor) IsUsernameTaken(
+	ctx context.Context,
+	username string,
+) (bool, error) {
+	if username == "" {
+		return false, ErrLackOfInfor
+	}
+
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("username", username))
+	const query = `SELECT EXISTS(SELECT 1 FROM accounts WHERE username = ?) AS is_taken`
+	var isTaken int
+	err := a.exec.QueryRowContext(ctx, query, username).Scan(&isTaken)
+	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to check username taken")
+		return false, err
+	}
+
+	if isTaken == 1 {
+		return true, nil
+	}
+	return false, nil
 }
 
 func (a accountAccessor) WithExecutor(
