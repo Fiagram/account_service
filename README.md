@@ -15,6 +15,7 @@
 - [x] Integrate mock framework for automation testing
 - [ ] Validate input to grpc server by extended protobuf package
 - [x] Fixbug SQL injection when querying database directly
+- [ ] Apply Docker for production releases
 
 # Introduction
 - A microservice for managing accounts belongs to Fiagram project.
