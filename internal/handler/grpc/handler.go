@@ -46,28 +46,46 @@ func (h Handler) CreateAccount(
 	}, nil
 }
 
-func (h Handler) CheckAccountValid(context.Context,
-	*account_service.CheckAccountValidRequest,
+func (h Handler) CheckAccountValid(
+	ctx context.Context,
+	request *account_service.CheckAccountValidRequest,
 ) (*account_service.CheckAccountValidResponse, error) {
+	output, err := h.accountLogic.CheckAccountValid(ctx,
+		logic.CheckAccountValidParams{
+			Username: request.Username,
+			Password: request.Password,
+		})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.CheckAccountValidResponse{
+		AccountId: output.AccountId,
+	}, nil
+
+}
+func (h Handler) GetAccount(
+	ctx context.Context,
+	request *account_service.GetAccountRequest,
+) (*account_service.GetAccountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckAccountValid not implemented")
 }
-func (h Handler) GetAccount(context.Context,
-	*account_service.GetAccountRequest,
-) (*account_service.GetAccountResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAccount not implemented")
-}
-func (h Handler) GetAccountAll(context.Context,
-	*account_service.GetAccountAllRequest,
+func (h Handler) GetAccountAll(
+	ctx context.Context,
+	request *account_service.GetAccountAllRequest,
 ) (*account_service.GetAccountAllResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAccountAll not implemented")
 }
-func (h Handler) GetAccountList(context.Context,
-	*account_service.GetAccountListRequest,
+func (h Handler) GetAccountList(
+	ctx context.Context,
+	request *account_service.GetAccountListRequest,
 ) (*account_service.GetAccountListResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAccountList not implemented")
 }
-func (h Handler) UpdateAccount(context.Context,
-	*account_service.UpdateAccountRequest,
+func (h Handler) UpdateAccount(
+	ctx context.Context,
+	request *account_service.UpdateAccountRequest,
 ) (*account_service.UpdateAccountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateAccount not implemented")
 }

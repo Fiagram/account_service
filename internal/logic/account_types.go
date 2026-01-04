@@ -28,3 +28,12 @@ type CreateAccountOutput struct {
 type DeleteAccountParams struct {
 	Username string
 }
+
+type CheckAccountValidParams struct {
+	Username string
+	Password string
+}
+
+type CheckAccountValidOutput struct {
+	AccountId uint64
+}

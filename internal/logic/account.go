@@ -13,6 +13,7 @@ import (
 type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
 	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
+	CheckAccountValid(ctx context.Context, params CheckAccountValidParams) (CheckAccountValidOutput, error)
 	// CreateSession(ctx context.Context, params CreateSessionParams) (CreateSessionOutput, error)
 }
 
@@ -137,6 +138,33 @@ func (a account) DeleteAccount(
 	return nil
 }
 
-// func (a *account) CreateSession(ctx context.Context, params CreateSessionParams) (CreateSessionOutput, error) {
-// 	return CreateSessionOutput{}, nil
-// }
+func (a account) CheckAccountValid(
+	ctx context.Context,
+	params CheckAccountValidParams,
+) (CheckAccountValidOutput, error) {
+	emptyObj := CheckAccountValidOutput{}
+	acc, err := a.accountAccessor.
+		GetAccountByUsername(ctx, params.Username)
+	if err != nil {
+		return emptyObj, status.Error(codes.NotFound, "failed to get account")
+	}
+
+	truly, err := a.accountPasswordAccessor.
+		GetAccountPassword(ctx, acc.Id)
+	if err != nil {
+		return emptyObj, status.Error(codes.NotFound, "failed to get password")
+	}
+
+	isValid, err := a.hashLogic.
+		IsHashEqual(ctx, params.Password, truly.HashedString)
+	if err != nil {
+		return emptyObj, status.Error(codes.Internal, "failed to when equal hashed")
+	}
+
+	if !isValid {
+		return emptyObj, nil
+	}
+	return CheckAccountValidOutput{
+		AccountId: acc.Id,
+	}, nil
+}
