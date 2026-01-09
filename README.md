@@ -8,6 +8,7 @@
     - [Run service as standalone](#run-service-as-standalone)
     - [Database migration](#database-migration)
 - [Testing](#testing)
+- [Deployment](#deployment)
 - [Contributors](#contributors)
 
 
@@ -15,7 +16,7 @@
 - [x] Integrate mock framework for automation testing
 - [ ] Validate input to grpc server by extended protobuf package
 - [x] Fixbug SQL injection when querying database directly
-- [ ] Apply Docker for production releases
+- [x] Apply Docker for production releases
 
 # Introduction
 - A microservice for managing accounts belongs to Fiagram project.
@@ -46,6 +47,16 @@ make migrate-new <name_of_new_schema>
 - Require to the Mysql database must be run at first [Run MySQL with docker](#mysql)
 ```
 make test
+```
+
+# Deployment
+- Build a docker image with the following command:
+```
+./scripts/build-docker-image-deployment.sh
+```
+- After building the docker image for `account_service`, let's try to deploy services (including mysql database):
+```
+make docker-compose-up-test
 ```
 
 # Contributors
