@@ -77,13 +77,21 @@ clean:
 	go clean -cache
 	go clean -testcache
 
-.PHONY: docker-compose-up-dev
-docker-compose-up-dev:
-	docker-compose -f deployments/docker-compose.dev.yml up -d
+.PHONY: docker-compose-up-test
+docker-compose-up-test:
+	docker-compose -f deployments/docker-compose.test.yml up -d --force-recreate
 
-.PHONY: docker-compose-down-dev
-docker-compose-down-dev:
-	docker-compose -f deployments/docker-compose.dev.yml down
+.PHONY: docker-compose-down-test
+docker-compose-down-test:
+	docker-compose -f deployments/docker-compose.test.yml down
+
+.PHONY: docker-compose-ps-test
+docker-compose-ps-test:
+	docker-compose -f deployments/docker-compose.test.yml ps
+
+.PHONY: docker-compose-logs-test
+docker-compose-logs-test:
+	docker-compose -f deployments/docker-compose.test.yml logs
 
 .PHONY: run-standalone-server
 run-standalone-server:

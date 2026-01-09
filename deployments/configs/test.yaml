@@ -1,0 +1,15 @@
+database:
+  type: mysql
+  host: account_service_database-0
+  port: 3306
+  username: root
+  password: root
+  database: db_account_service
+grpc:
+  address: account_service-0
+  port: 8080
+auth:
+  hash:
+    cost: 10
+log:
+  level: debug
