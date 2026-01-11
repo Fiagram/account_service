@@ -27,7 +27,7 @@ type AccountInfo_Role int32
 const (
 	AccountInfo_NONE   AccountInfo_Role = 0
 	AccountInfo_ADMIN  AccountInfo_Role = 1
-	AccountInfo_NORMAL AccountInfo_Role = 2
+	AccountInfo_MEMBER AccountInfo_Role = 2
 )
 
 // Enum value maps for AccountInfo_Role.
@@ -35,12 +35,12 @@ var (
 	AccountInfo_Role_name = map[int32]string{
 		0: "NONE",
 		1: "ADMIN",
-		2: "NORMAL",
+		2: "MEMBER",
 	}
 	AccountInfo_Role_value = map[string]int32{
 		"NONE":   0,
 		"ADMIN":  1,
-		"NORMAL": 2,
+		"MEMBER": 2,
 	}
 )
 
@@ -826,7 +826,7 @@ const file_api_account_service_account_service_proto_rawDesc = "" +
 	"\x04NONE\x10\x00\x12\t\n" +
 	"\x05ADMIN\x10\x01\x12\n" +
 	"\n" +
-	"\x06NORMAL\x10\x02\"{\n" +
+	"\x06MEMBER\x10\x02\"{\n" +
 	"\x14CreateAccountRequest\x12G\n" +
 	"\faccount_info\x18\x01 \x01(\v2$.fiagram.account_service.AccountInfoR\vaccountInfo\x12\x1a\n" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\"6\n" +
