@@ -4,7 +4,7 @@ services:
     container_name: account_service_database-0
     restart: always
     ports:
-      - "3330:3306"
+      - "11000:3306"
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: db_account_service
@@ -29,7 +29,7 @@ services:
     container_name: account_service-0
     restart: always
     ports:
-      - "8080:8080"
+      - "11001:8080"
     volumes:
       - ./configs:/home:ro
     command: /account_service -c /home/test.yaml
