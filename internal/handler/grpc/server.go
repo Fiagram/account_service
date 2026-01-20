@@ -2,10 +2,11 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"net"
 
+	"github.com/Fiagram/account_service/internal/configs"
 	"github.com/Fiagram/account_service/internal/generated/grpc/account_service"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
@@ -14,19 +15,25 @@ type Server interface {
 }
 
 type server struct {
+	logger  *zap.Logger
+	config  configs.Grpc
 	handler account_service.AccountServiceServer
 }
 
 func NewServer(
+	config configs.Grpc,
 	handler account_service.AccountServiceServer,
+	logger *zap.Logger,
 ) Server {
 	return &server{
+		config:  config,
 		handler: handler,
+		logger:  logger,
 	}
 }
 
 func (s *server) Start(ctx context.Context) error {
-	listener, err := net.Listen("tcp", "0.0.0.0:8080")
+	listener, err := net.Listen("tcp", s.config.Address+":"+s.config.Port)
 	if err != nil {
 		return err
 	}
@@ -34,6 +41,8 @@ func (s *server) Start(ctx context.Context) error {
 
 	server := grpc.NewServer()
 	account_service.RegisterAccountServiceServer(server, s.handler)
-	fmt.Println("server listening at 0.0.0.0:8080")
+	s.logger.With(zap.String("address", s.config.Address)).
+		With(zap.String("port", s.config.Port)).
+		Info("the grpc server listening")
 	return server.Serve(listener)
 }

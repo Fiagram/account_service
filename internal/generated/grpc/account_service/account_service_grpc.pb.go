@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	AccountService_CreateAccount_FullMethodName     = "/fiagram.account_service.AccountService/CreateAccount"
 	AccountService_CheckAccountValid_FullMethodName = "/fiagram.account_service.AccountService/CheckAccountValid"
+	AccountService_IsUsernameTaken_FullMethodName   = "/fiagram.account_service.AccountService/IsUsernameTaken"
 	AccountService_GetAccount_FullMethodName        = "/fiagram.account_service.AccountService/GetAccount"
 	AccountService_GetAccountAll_FullMethodName     = "/fiagram.account_service.AccountService/GetAccountAll"
 	AccountService_GetAccountList_FullMethodName    = "/fiagram.account_service.AccountService/GetAccountList"
@@ -34,6 +35,7 @@ const (
 type AccountServiceClient interface {
 	CreateAccount(ctx context.Context, in *CreateAccountRequest, opts ...grpc.CallOption) (*CreateAccountResponse, error)
 	CheckAccountValid(ctx context.Context, in *CheckAccountValidRequest, opts ...grpc.CallOption) (*CheckAccountValidResponse, error)
+	IsUsernameTaken(ctx context.Context, in *IsUsernameTakenRequest, opts ...grpc.CallOption) (*IsUsernameTakenResponse, error)
 	GetAccount(ctx context.Context, in *GetAccountRequest, opts ...grpc.CallOption) (*GetAccountResponse, error)
 	GetAccountAll(ctx context.Context, in *GetAccountAllRequest, opts ...grpc.CallOption) (*GetAccountAllResponse, error)
 	GetAccountList(ctx context.Context, in *GetAccountListRequest, opts ...grpc.CallOption) (*GetAccountListResponse, error)
@@ -63,6 +65,16 @@ func (c *accountServiceClient) CheckAccountValid(ctx context.Context, in *CheckA
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CheckAccountValidResponse)
 	err := c.cc.Invoke(ctx, AccountService_CheckAccountValid_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *accountServiceClient) IsUsernameTaken(ctx context.Context, in *IsUsernameTakenRequest, opts ...grpc.CallOption) (*IsUsernameTakenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IsUsernameTakenResponse)
+	err := c.cc.Invoke(ctx, AccountService_IsUsernameTaken_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -125,6 +137,7 @@ func (c *accountServiceClient) DeleteAccount(ctx context.Context, in *DeleteAcco
 type AccountServiceServer interface {
 	CreateAccount(context.Context, *CreateAccountRequest) (*CreateAccountResponse, error)
 	CheckAccountValid(context.Context, *CheckAccountValidRequest) (*CheckAccountValidResponse, error)
+	IsUsernameTaken(context.Context, *IsUsernameTakenRequest) (*IsUsernameTakenResponse, error)
 	GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error)
 	GetAccountAll(context.Context, *GetAccountAllRequest) (*GetAccountAllResponse, error)
 	GetAccountList(context.Context, *GetAccountListRequest) (*GetAccountListResponse, error)
@@ -145,6 +158,9 @@ func (UnimplementedAccountServiceServer) CreateAccount(context.Context, *CreateA
 }
 func (UnimplementedAccountServiceServer) CheckAccountValid(context.Context, *CheckAccountValidRequest) (*CheckAccountValidResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CheckAccountValid not implemented")
+}
+func (UnimplementedAccountServiceServer) IsUsernameTaken(context.Context, *IsUsernameTakenRequest) (*IsUsernameTakenResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method IsUsernameTaken not implemented")
 }
 func (UnimplementedAccountServiceServer) GetAccount(context.Context, *GetAccountRequest) (*GetAccountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetAccount not implemented")
@@ -214,6 +230,24 @@ func _AccountService_CheckAccountValid_Handler(srv interface{}, ctx context.Cont
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AccountServiceServer).CheckAccountValid(ctx, req.(*CheckAccountValidRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AccountService_IsUsernameTaken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsUsernameTakenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AccountServiceServer).IsUsernameTaken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AccountService_IsUsernameTaken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AccountServiceServer).IsUsernameTaken(ctx, req.(*IsUsernameTakenRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -322,6 +356,10 @@ var AccountService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CheckAccountValid",
 			Handler:    _AccountService_CheckAccountValid_Handler,
+		},
+		{
+			MethodName: "IsUsernameTaken",
+			Handler:    _AccountService_IsUsernameTaken_Handler,
 		},
 		{
 			MethodName: "GetAccount",

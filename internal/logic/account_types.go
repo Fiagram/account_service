@@ -37,3 +37,11 @@ type CheckAccountValidParams struct {
 type CheckAccountValidOutput struct {
 	AccountId uint64
 }
+
+type IsUsernameTakenParams struct {
+	Username string
+}
+
+type IsUsernameTakenOutput struct {
+	IsTaken bool
+}

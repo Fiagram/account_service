@@ -14,7 +14,8 @@ init:
 
 .PHONY: generate
 generate:
-	protoc -I=. \
+	@echo "--- Generating protobuf stubs ---"
+	@protoc -I=. \
 	--go_out=internal/generated \
 	--go-grpc_out=internal/generated \
 	api/account_service/*.proto

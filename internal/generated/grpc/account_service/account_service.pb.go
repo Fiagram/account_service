@@ -811,6 +811,94 @@ func (x *CheckAccountValidResponse) GetAccountId() uint64 {
 	return 0
 }
 
+type IsUsernameTakenRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IsUsernameTakenRequest) Reset() {
+	*x = IsUsernameTakenRequest{}
+	mi := &file_api_account_service_account_service_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IsUsernameTakenRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsUsernameTakenRequest) ProtoMessage() {}
+
+func (x *IsUsernameTakenRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_api_account_service_account_service_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsUsernameTakenRequest.ProtoReflect.Descriptor instead.
+func (*IsUsernameTakenRequest) Descriptor() ([]byte, []int) {
+	return file_api_account_service_account_service_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *IsUsernameTakenRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
+type IsUsernameTakenResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IsTaken       bool                   `protobuf:"varint,1,opt,name=is_taken,json=isTaken,proto3" json:"is_taken,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IsUsernameTakenResponse) Reset() {
+	*x = IsUsernameTakenResponse{}
+	mi := &file_api_account_service_account_service_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IsUsernameTakenResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsUsernameTakenResponse) ProtoMessage() {}
+
+func (x *IsUsernameTakenResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_api_account_service_account_service_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsUsernameTakenResponse.ProtoReflect.Descriptor instead.
+func (*IsUsernameTakenResponse) Descriptor() ([]byte, []int) {
+	return file_api_account_service_account_service_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *IsUsernameTakenResponse) GetIsTaken() bool {
+	if x != nil {
+		return x.IsTaken
+	}
+	return false
+}
+
 var File_api_account_service_account_service_proto protoreflect.FileDescriptor
 
 const file_api_account_service_account_service_proto_rawDesc = "" +
@@ -866,10 +954,15 @@ const file_api_account_service_account_service_proto_rawDesc = "" +
 	"\bpassword\x18\x02 \x01(\tR\bpassword\":\n" +
 	"\x19CheckAccountValidResponse\x12\x1d\n" +
 	"\n" +
-	"account_id\x18\x01 \x01(\x04R\taccountId2\xb4\x06\n" +
+	"account_id\x18\x01 \x01(\x04R\taccountId\"4\n" +
+	"\x16IsUsernameTakenRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"4\n" +
+	"\x17IsUsernameTakenResponse\x12\x19\n" +
+	"\bis_taken\x18\x01 \x01(\bR\aisTaken2\xac\a\n" +
 	"\x0eAccountService\x12p\n" +
 	"\rCreateAccount\x12-.fiagram.account_service.CreateAccountRequest\x1a..fiagram.account_service.CreateAccountResponse\"\x00\x12|\n" +
-	"\x11CheckAccountValid\x121.fiagram.account_service.CheckAccountValidRequest\x1a2.fiagram.account_service.CheckAccountValidResponse\"\x00\x12g\n" +
+	"\x11CheckAccountValid\x121.fiagram.account_service.CheckAccountValidRequest\x1a2.fiagram.account_service.CheckAccountValidResponse\"\x00\x12v\n" +
+	"\x0fIsUsernameTaken\x12/.fiagram.account_service.IsUsernameTakenRequest\x1a0.fiagram.account_service.IsUsernameTakenResponse\"\x00\x12g\n" +
 	"\n" +
 	"GetAccount\x12*.fiagram.account_service.GetAccountRequest\x1a+.fiagram.account_service.GetAccountResponse\"\x00\x12p\n" +
 	"\rGetAccountAll\x12-.fiagram.account_service.GetAccountAllRequest\x1a..fiagram.account_service.GetAccountAllResponse\"\x00\x12s\n" +
@@ -890,7 +983,7 @@ func file_api_account_service_account_service_proto_rawDescGZIP() []byte {
 }
 
 var file_api_account_service_account_service_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_api_account_service_account_service_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_api_account_service_account_service_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_api_account_service_account_service_proto_goTypes = []any{
 	(AccountInfo_Role)(0),             // 0: fiagram.account_service.AccountInfo.Role
 	(*AccountInfo)(nil),               // 1: fiagram.account_service.AccountInfo
@@ -908,32 +1001,36 @@ var file_api_account_service_account_service_proto_goTypes = []any{
 	(*DeleteAccountResponse)(nil),     // 13: fiagram.account_service.DeleteAccountResponse
 	(*CheckAccountValidRequest)(nil),  // 14: fiagram.account_service.CheckAccountValidRequest
 	(*CheckAccountValidResponse)(nil), // 15: fiagram.account_service.CheckAccountValidResponse
-	(*emptypb.Empty)(nil),             // 16: google.protobuf.Empty
+	(*IsUsernameTakenRequest)(nil),    // 16: fiagram.account_service.IsUsernameTakenRequest
+	(*IsUsernameTakenResponse)(nil),   // 17: fiagram.account_service.IsUsernameTakenResponse
+	(*emptypb.Empty)(nil),             // 18: google.protobuf.Empty
 }
 var file_api_account_service_account_service_proto_depIdxs = []int32{
 	0,  // 0: fiagram.account_service.AccountInfo.role:type_name -> fiagram.account_service.AccountInfo.Role
 	1,  // 1: fiagram.account_service.CreateAccountRequest.account_info:type_name -> fiagram.account_service.AccountInfo
 	1,  // 2: fiagram.account_service.GetAccountResponse.account:type_name -> fiagram.account_service.AccountInfo
-	16, // 3: fiagram.account_service.GetAccountAllRequest.empty:type_name -> google.protobuf.Empty
+	18, // 3: fiagram.account_service.GetAccountAllRequest.empty:type_name -> google.protobuf.Empty
 	1,  // 4: fiagram.account_service.GetAccountAllResponse.account_info_list:type_name -> fiagram.account_service.AccountInfo
 	1,  // 5: fiagram.account_service.GetAccountListResponse.account_info_list:type_name -> fiagram.account_service.AccountInfo
 	1,  // 6: fiagram.account_service.UpdateAccountRequest.updated_account_info:type_name -> fiagram.account_service.AccountInfo
 	2,  // 7: fiagram.account_service.AccountService.CreateAccount:input_type -> fiagram.account_service.CreateAccountRequest
 	14, // 8: fiagram.account_service.AccountService.CheckAccountValid:input_type -> fiagram.account_service.CheckAccountValidRequest
-	4,  // 9: fiagram.account_service.AccountService.GetAccount:input_type -> fiagram.account_service.GetAccountRequest
-	6,  // 10: fiagram.account_service.AccountService.GetAccountAll:input_type -> fiagram.account_service.GetAccountAllRequest
-	8,  // 11: fiagram.account_service.AccountService.GetAccountList:input_type -> fiagram.account_service.GetAccountListRequest
-	10, // 12: fiagram.account_service.AccountService.UpdateAccount:input_type -> fiagram.account_service.UpdateAccountRequest
-	12, // 13: fiagram.account_service.AccountService.DeleteAccount:input_type -> fiagram.account_service.DeleteAccountRequest
-	3,  // 14: fiagram.account_service.AccountService.CreateAccount:output_type -> fiagram.account_service.CreateAccountResponse
-	15, // 15: fiagram.account_service.AccountService.CheckAccountValid:output_type -> fiagram.account_service.CheckAccountValidResponse
-	5,  // 16: fiagram.account_service.AccountService.GetAccount:output_type -> fiagram.account_service.GetAccountResponse
-	7,  // 17: fiagram.account_service.AccountService.GetAccountAll:output_type -> fiagram.account_service.GetAccountAllResponse
-	9,  // 18: fiagram.account_service.AccountService.GetAccountList:output_type -> fiagram.account_service.GetAccountListResponse
-	11, // 19: fiagram.account_service.AccountService.UpdateAccount:output_type -> fiagram.account_service.UpdateAccountResponse
-	13, // 20: fiagram.account_service.AccountService.DeleteAccount:output_type -> fiagram.account_service.DeleteAccountResponse
-	14, // [14:21] is the sub-list for method output_type
-	7,  // [7:14] is the sub-list for method input_type
+	16, // 9: fiagram.account_service.AccountService.IsUsernameTaken:input_type -> fiagram.account_service.IsUsernameTakenRequest
+	4,  // 10: fiagram.account_service.AccountService.GetAccount:input_type -> fiagram.account_service.GetAccountRequest
+	6,  // 11: fiagram.account_service.AccountService.GetAccountAll:input_type -> fiagram.account_service.GetAccountAllRequest
+	8,  // 12: fiagram.account_service.AccountService.GetAccountList:input_type -> fiagram.account_service.GetAccountListRequest
+	10, // 13: fiagram.account_service.AccountService.UpdateAccount:input_type -> fiagram.account_service.UpdateAccountRequest
+	12, // 14: fiagram.account_service.AccountService.DeleteAccount:input_type -> fiagram.account_service.DeleteAccountRequest
+	3,  // 15: fiagram.account_service.AccountService.CreateAccount:output_type -> fiagram.account_service.CreateAccountResponse
+	15, // 16: fiagram.account_service.AccountService.CheckAccountValid:output_type -> fiagram.account_service.CheckAccountValidResponse
+	17, // 17: fiagram.account_service.AccountService.IsUsernameTaken:output_type -> fiagram.account_service.IsUsernameTakenResponse
+	5,  // 18: fiagram.account_service.AccountService.GetAccount:output_type -> fiagram.account_service.GetAccountResponse
+	7,  // 19: fiagram.account_service.AccountService.GetAccountAll:output_type -> fiagram.account_service.GetAccountAllResponse
+	9,  // 20: fiagram.account_service.AccountService.GetAccountList:output_type -> fiagram.account_service.GetAccountListResponse
+	11, // 21: fiagram.account_service.AccountService.UpdateAccount:output_type -> fiagram.account_service.UpdateAccountResponse
+	13, // 22: fiagram.account_service.AccountService.DeleteAccount:output_type -> fiagram.account_service.DeleteAccountResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
 	7,  // [7:7] is the sub-list for extension type_name
 	7,  // [7:7] is the sub-list for extension extendee
 	0,  // [0:7] is the sub-list for field type_name
@@ -950,7 +1047,7 @@ func file_api_account_service_account_service_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_api_account_service_account_service_proto_rawDesc), len(file_api_account_service_account_service_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   15,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

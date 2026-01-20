@@ -14,6 +14,7 @@ type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
 	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
 	CheckAccountValid(ctx context.Context, params CheckAccountValidParams) (CheckAccountValidOutput, error)
+	IsUsernameTaken(ctx context.Context, params IsUsernameTakenParams) (IsUsernameTakenOutput, error)
 	// CreateSession(ctx context.Context, params CreateSessionParams) (CreateSessionOutput, error)
 }
 
@@ -166,5 +167,19 @@ func (a account) CheckAccountValid(
 	}
 	return CheckAccountValidOutput{
 		AccountId: acc.Id,
+	}, nil
+}
+
+func (a account) IsUsernameTaken(
+	ctx context.Context,
+	params IsUsernameTakenParams,
+) (IsUsernameTakenOutput, error) {
+	emptyObj := IsUsernameTakenOutput{}
+	isTaken, err := a.accountAccessor.IsUsernameTaken(ctx, params.Username)
+	if err != nil {
+		return emptyObj, status.Error(codes.Internal, "failed to check username is taken")
+	}
+	return IsUsernameTakenOutput{
+		IsTaken: isTaken,
 	}, nil
 }

@@ -63,8 +63,24 @@ func (h Handler) CheckAccountValid(
 	return &account_service.CheckAccountValidResponse{
 		AccountId: output.AccountId,
 	}, nil
-
 }
+
+func (h Handler) IsUsernameTaken(
+	ctx context.Context,
+	request *account_service.IsUsernameTakenRequest,
+) (*account_service.IsUsernameTakenResponse, error) {
+	output, err := h.accountLogic.IsUsernameTaken(ctx,
+		logic.IsUsernameTakenParams{
+			Username: request.Username,
+		})
+	if err != nil {
+		return nil, err
+	}
+	return &account_service.IsUsernameTakenResponse{
+		IsTaken: output.IsTaken,
+	}, nil
+}
+
 func (h Handler) GetAccount(
 	ctx context.Context,
 	request *account_service.GetAccountRequest,

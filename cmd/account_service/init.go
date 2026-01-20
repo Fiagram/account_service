@@ -32,7 +32,7 @@ func InitStandaloneServer(configFilePath string) (app.StandaloneServer, func(), 
 	accountLogic := logic.NewAccount(db, aAsor, apAsor, hashLogic, logger)
 
 	accountHandler := grpc.NewHandler(accountLogic)
-	grpcServer := grpc.NewServer(accountHandler)
+	grpcServer := grpc.NewServer(config.Grpc, accountHandler, logger)
 
 	standaloneServer := app.NewStandaloneServer(grpcServer, logger)
 

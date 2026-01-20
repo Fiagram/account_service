@@ -1,13 +1,13 @@
 database:
   type: mysql
   host: 0.0.0.0
-  port: 3330
+  port: 11000
   username: root
   password: root
   database: db_account_service
 grpc:
   address: 0.0.0.0
-  port: 8080
+  port: 11001
 auth:
   hash:
     cost: 10
