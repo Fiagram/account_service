@@ -7,7 +7,7 @@ database:
   database: db_account_service
 grpc:
   address: account_service-0
-  port: 8080
+  port: 11001
 auth:
   hash:
     cost: 10

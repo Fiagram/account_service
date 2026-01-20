@@ -29,7 +29,7 @@ services:
     container_name: account_service-0
     restart: always
     ports:
-      - "11001:8080"
+      - "11001:11001"
     volumes:
       - ./configs:/home:ro
     command: /account_service -c /home/test.yaml
