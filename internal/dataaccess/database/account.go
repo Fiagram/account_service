@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -32,6 +33,9 @@ type AccountAccessor interface {
 	DeleteAccountByUsername(ctx context.Context, username string) error
 
 	IsUsernameTaken(ctx context.Context, username string) (bool, error)
+
+	GetAccountAll(ctx context.Context) ([]Account, error)
+	GetAccountList(ctx context.Context, ids []uint64) ([]Account, error)
 
 	WithExecutor(exec Executor) AccountAccessor
 }
@@ -257,6 +261,83 @@ func (a accountAccessor) IsUsernameTaken(
 		return true, nil
 	}
 	return false, nil
+}
+
+func (a accountAccessor) GetAccountAll(
+	ctx context.Context,
+) ([]Account, error) {
+	logger := utils.LoggerWithContext(ctx, a.logger)
+	const query = `SELECT * FROM accounts`
+	rows, err := a.exec.QueryContext(ctx, query)
+	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to get all accounts")
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []Account
+	for rows.Next() {
+		var acc Account
+		err := rows.Scan(&acc.Id,
+			&acc.Username,
+			&acc.Fullname,
+			&acc.Email,
+			&acc.PhoneNumber,
+			&acc.RoleId,
+			&acc.CreatedAt,
+			&acc.UpdatedAt)
+		if err != nil {
+			logger.With(zap.Error(err)).Error("failed to scan account")
+			return nil, err
+		}
+		accounts = append(accounts, acc)
+	}
+
+	return accounts, nil
+}
+
+func (a accountAccessor) GetAccountList(
+	ctx context.Context,
+	ids []uint64,
+) ([]Account, error) {
+	if len(ids) == 0 {
+		return []Account{}, fmt.Errorf("ids is empty")
+	}
+
+	logger := utils.LoggerWithContext(ctx, a.logger).With(zap.Any("ids", ids))
+	query := `SELECT * FROM accounts WHERE id IN (?` + strings.Repeat(",?", len(ids)-1) + `)`
+
+	args := make([]any, len(ids))
+	for i, id := range ids {
+		args[i] = id
+	}
+
+	rows, err := a.exec.QueryContext(ctx, query, args...)
+	if err != nil {
+		logger.With(zap.Error(err)).Error("failed to get account list")
+		return nil, err
+	}
+	defer rows.Close()
+
+	var accounts []Account
+	for rows.Next() {
+		var acc Account
+		err := rows.Scan(&acc.Id,
+			&acc.Username,
+			&acc.Fullname,
+			&acc.Email,
+			&acc.PhoneNumber,
+			&acc.RoleId,
+			&acc.CreatedAt,
+			&acc.UpdatedAt)
+		if err != nil {
+			logger.With(zap.Error(err)).Error("failed to scan account")
+			return nil, err
+		}
+		accounts = append(accounts, acc)
+	}
+
+	return accounts, nil
 }
 
 func (a accountAccessor) WithExecutor(

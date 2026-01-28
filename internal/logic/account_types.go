@@ -5,7 +5,7 @@ type Role uint8
 const (
 	None Role = iota
 	Admin
-	member
+	Member
 )
 
 type AccountInfo struct {
@@ -44,4 +44,38 @@ type IsUsernameTakenParams struct {
 
 type IsUsernameTakenOutput struct {
 	IsTaken bool
+}
+
+type GetAccountParams struct {
+	AccountId uint64
+}
+
+type GetAccountOutput struct {
+	AccountId   uint64
+	AccountInfo AccountInfo
+}
+
+type GetAccountAllParams struct{}
+
+type GetAccountAllOutput struct {
+	AccountIds   []uint64
+	AccountInfos []AccountInfo
+}
+
+type GetAccountListParams struct {
+	AccountIds []uint64
+}
+
+type GetAccountListOutput struct {
+	AccountIds   []uint64
+	AccountInfos []AccountInfo
+}
+
+type UpdateAccountParams struct {
+	AccountId          uint64
+	UpdatedAccountInfo AccountInfo
+}
+
+type UpdateAccountOutput struct {
+	AccountId uint64
 }

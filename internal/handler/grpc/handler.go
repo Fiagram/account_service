@@ -5,8 +5,6 @@ import (
 
 	"github.com/Fiagram/account_service/internal/generated/grpc/account_service"
 	"github.com/Fiagram/account_service/internal/logic"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type Handler struct {
@@ -85,25 +83,105 @@ func (h Handler) GetAccount(
 	ctx context.Context,
 	request *account_service.GetAccountRequest,
 ) (*account_service.GetAccountResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CheckAccountValid not implemented")
+	output, err := h.accountLogic.GetAccount(ctx,
+		logic.GetAccountParams{
+			AccountId: request.GetAccountId(),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.GetAccountResponse{
+		AccountId: output.AccountId,
+		Account: &account_service.AccountInfo{
+			Username:    output.AccountInfo.Username,
+			Fullname:    output.AccountInfo.Fullname,
+			Email:       output.AccountInfo.Email,
+			PhoneNumber: output.AccountInfo.PhoneNumber,
+			Role:        account_service.AccountInfo_Role(output.AccountInfo.Role),
+		},
+	}, nil
 }
 func (h Handler) GetAccountAll(
 	ctx context.Context,
 	request *account_service.GetAccountAllRequest,
 ) (*account_service.GetAccountAllResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAccountAll not implemented")
+	output, err := h.accountLogic.GetAccountAll(ctx,
+		logic.GetAccountAllParams{},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	accountInfos := make([]*account_service.AccountInfo, 0, len(output.AccountInfos))
+	for _, info := range output.AccountInfos {
+		accountInfos = append(accountInfos, &account_service.AccountInfo{
+			Username:    info.Username,
+			Fullname:    info.Fullname,
+			Email:       info.Email,
+			PhoneNumber: info.PhoneNumber,
+			Role:        account_service.AccountInfo_Role(info.Role),
+		})
+	}
+
+	return &account_service.GetAccountAllResponse{
+		AccountIdList:   output.AccountIds,
+		AccountInfoList: accountInfos,
+	}, nil
 }
 func (h Handler) GetAccountList(
 	ctx context.Context,
 	request *account_service.GetAccountListRequest,
 ) (*account_service.GetAccountListResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAccountList not implemented")
+	output, err := h.accountLogic.GetAccountList(ctx,
+		logic.GetAccountListParams{
+			AccountIds: request.GetAccountIdList(),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	accountInfos := make([]*account_service.AccountInfo, 0, len(output.AccountInfos))
+	for _, info := range output.AccountInfos {
+		accountInfos = append(accountInfos, &account_service.AccountInfo{
+			Username:    info.Username,
+			Fullname:    info.Fullname,
+			Email:       info.Email,
+			PhoneNumber: info.PhoneNumber,
+			Role:        account_service.AccountInfo_Role(info.Role),
+		})
+	}
+
+	return &account_service.GetAccountListResponse{
+		AccountIdList:   output.AccountIds,
+		AccountInfoList: accountInfos,
+	}, nil
 }
 func (h Handler) UpdateAccount(
 	ctx context.Context,
 	request *account_service.UpdateAccountRequest,
 ) (*account_service.UpdateAccountResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method UpdateAccount not implemented")
+	output, err := h.accountLogic.UpdateAccount(ctx,
+		logic.UpdateAccountParams{
+			AccountId: request.GetAccountId(),
+			UpdatedAccountInfo: logic.AccountInfo{
+				Username:    request.GetUpdatedAccountInfo().GetUsername(),
+				Fullname:    request.GetUpdatedAccountInfo().GetFullname(),
+				Email:       request.GetUpdatedAccountInfo().GetEmail(),
+				PhoneNumber: request.GetUpdatedAccountInfo().GetPhoneNumber(),
+				Role:        logic.Role(request.GetUpdatedAccountInfo().GetRole()),
+			},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.UpdateAccountResponse{
+		AccountId: output.AccountId,
+	}, nil
 }
 
 func (h Handler) DeleteAccount(

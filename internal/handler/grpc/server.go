@@ -6,6 +6,7 @@ import (
 
 	"github.com/Fiagram/account_service/internal/configs"
 	"github.com/Fiagram/account_service/internal/generated/grpc/account_service"
+	"github.com/Fiagram/account_service/internal/utils"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -33,7 +34,13 @@ func NewServer(
 }
 
 func (s *server) Start(ctx context.Context) error {
-	listener, err := net.Listen("tcp", s.config.Address+":"+s.config.Port)
+	address := s.config.Address
+	port := s.config.Port
+	logger := utils.LoggerWithContext(ctx, s.logger).
+		With(zap.String("address", address)).
+		With(zap.String("port", port))
+
+	listener, err := net.Listen("tcp", address+":"+port)
 	if err != nil {
 		return err
 	}
@@ -41,8 +48,6 @@ func (s *server) Start(ctx context.Context) error {
 
 	server := grpc.NewServer()
 	account_service.RegisterAccountServiceServer(server, s.handler)
-	s.logger.With(zap.String("address", s.config.Address)).
-		With(zap.String("port", s.config.Port)).
-		Info("the grpc server listening")
+	logger.Info("the grpc server listening")
 	return server.Serve(listener)
 }
