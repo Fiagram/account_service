@@ -161,10 +161,10 @@ func (h Handler) GetAccountList(
 }
 func (h Handler) UpdateAccount(
 	ctx context.Context,
-	request *account_service.UpdateAccountRequest,
-) (*account_service.UpdateAccountResponse, error) {
-	output, err := h.accountLogic.UpdateAccount(ctx,
-		logic.UpdateAccountParams{
+	request *account_service.UpdateAccountInfoRequest,
+) (*account_service.UpdateAccountInfoResponse, error) {
+	output, err := h.accountLogic.UpdateAccountInfo(ctx,
+		logic.UpdateAccountInfoParams{
 			AccountId: request.GetAccountId(),
 			UpdatedAccountInfo: logic.AccountInfo{
 				Username:    request.GetUpdatedAccountInfo().GetUsername(),
@@ -179,7 +179,7 @@ func (h Handler) UpdateAccount(
 		return nil, err
 	}
 
-	return &account_service.UpdateAccountResponse{
+	return &account_service.UpdateAccountInfoResponse{
 		AccountId: output.AccountId,
 	}, nil
 }

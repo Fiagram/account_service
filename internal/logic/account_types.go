@@ -75,11 +75,11 @@ type GetAccountListOutput struct {
 	AccountInfos []AccountInfo
 }
 
-type UpdateAccountParams struct {
+type UpdateAccountInfoParams struct {
 	AccountId          uint64
 	UpdatedAccountInfo AccountInfo
 }
 
-type UpdateAccountOutput struct {
+type UpdateAccountInfoOutput struct {
 	AccountId uint64
 }

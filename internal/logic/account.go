@@ -21,7 +21,7 @@ type Account interface {
 	GetAccountAll(ctx context.Context, params GetAccountAllParams) (GetAccountAllOutput, error)
 	GetAccountList(ctx context.Context, params GetAccountListParams) (GetAccountListOutput, error)
 
-	UpdateAccount(ctx context.Context, params UpdateAccountParams) (UpdateAccountOutput, error)
+	UpdateAccountInfo(ctx context.Context, params UpdateAccountInfoParams) (UpdateAccountInfoOutput, error)
 
 	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
 	DeleteAccountByUsername(ctx context.Context, params DeleteAccountByUsernameParams) error
@@ -305,11 +305,11 @@ func (a account) GetAccountList(
 	}, nil
 }
 
-func (a account) UpdateAccount(
+func (a account) UpdateAccountInfo(
 	ctx context.Context,
-	params UpdateAccountParams,
-) (UpdateAccountOutput, error) {
-	emptyObj := UpdateAccountOutput{}
+	params UpdateAccountInfoParams,
+) (UpdateAccountInfoOutput, error) {
+	emptyObj := UpdateAccountInfoOutput{}
 
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
@@ -346,7 +346,7 @@ func (a account) UpdateAccount(
 		return emptyObj, ErrTxCommitFailed
 	}
 
-	return UpdateAccountOutput{
+	return UpdateAccountInfoOutput{
 		AccountId: acc.Id,
 	}, nil
 }
