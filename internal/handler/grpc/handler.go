@@ -20,7 +20,7 @@ func NewHandler(
 	}
 }
 
-func (h Handler) CreateAccount(
+func (h *Handler) CreateAccount(
 	ctx context.Context,
 	request *account_service.CreateAccountRequest,
 ) (*account_service.CreateAccountResponse, error) {
@@ -44,7 +44,7 @@ func (h Handler) CreateAccount(
 	}, nil
 }
 
-func (h Handler) CheckAccountValid(
+func (h *Handler) CheckAccountValid(
 	ctx context.Context,
 	request *account_service.CheckAccountValidRequest,
 ) (*account_service.CheckAccountValidResponse, error) {
@@ -63,7 +63,7 @@ func (h Handler) CheckAccountValid(
 	}, nil
 }
 
-func (h Handler) IsUsernameTaken(
+func (h *Handler) IsUsernameTaken(
 	ctx context.Context,
 	request *account_service.IsUsernameTakenRequest,
 ) (*account_service.IsUsernameTakenResponse, error) {
@@ -79,7 +79,7 @@ func (h Handler) IsUsernameTaken(
 	}, nil
 }
 
-func (h Handler) GetAccount(
+func (h *Handler) GetAccount(
 	ctx context.Context,
 	request *account_service.GetAccountRequest,
 ) (*account_service.GetAccountResponse, error) {
@@ -103,7 +103,7 @@ func (h Handler) GetAccount(
 		},
 	}, nil
 }
-func (h Handler) GetAccountAll(
+func (h *Handler) GetAccountAll(
 	ctx context.Context,
 	request *account_service.GetAccountAllRequest,
 ) (*account_service.GetAccountAllResponse, error) {
@@ -130,7 +130,7 @@ func (h Handler) GetAccountAll(
 		AccountInfoList: accountInfos,
 	}, nil
 }
-func (h Handler) GetAccountList(
+func (h *Handler) GetAccountList(
 	ctx context.Context,
 	request *account_service.GetAccountListRequest,
 ) (*account_service.GetAccountListResponse, error) {
@@ -159,7 +159,7 @@ func (h Handler) GetAccountList(
 		AccountInfoList: accountInfos,
 	}, nil
 }
-func (h Handler) UpdateAccount(
+func (h *Handler) UpdateAccountInfo(
 	ctx context.Context,
 	request *account_service.UpdateAccountInfoRequest,
 ) (*account_service.UpdateAccountInfoResponse, error) {
@@ -184,7 +184,26 @@ func (h Handler) UpdateAccount(
 	}, nil
 }
 
-func (h Handler) DeleteAccount(
+func (h *Handler) UpdateAccountPassword(
+	ctx context.Context,
+	request *account_service.UpdateAccountPasswordRequest,
+) (*account_service.UpdateAccountPasswordResponse, error) {
+	output, err := h.accountLogic.UpdateAccountPassword(ctx,
+		logic.UpdateAccountPasswordParams{
+			AccountId: request.GetAccountId(),
+			Password:  request.GetPassword(),
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.UpdateAccountPasswordResponse{
+		AccountId: output.AccountId,
+	}, nil
+}
+
+func (h *Handler) DeleteAccount(
 	ctx context.Context,
 	request *account_service.DeleteAccountRequest,
 ) (*account_service.DeleteAccountResponse, error) {
@@ -201,7 +220,7 @@ func (h Handler) DeleteAccount(
 	}, nil
 }
 
-func (h Handler) DeleteAccountByUsername(
+func (h *Handler) DeleteAccountByUsername(
 	ctx context.Context,
 	request *account_service.DeleteAccountByUsernameRequest,
 ) (*account_service.DeleteAccountByUsernameResponse, error) {

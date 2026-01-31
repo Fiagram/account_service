@@ -83,3 +83,12 @@ type UpdateAccountInfoParams struct {
 type UpdateAccountInfoOutput struct {
 	AccountId uint64
 }
+
+type UpdateAccountPasswordParams struct {
+	AccountId uint64
+	Password  string
+}
+
+type UpdateAccountPasswordOutput struct {
+	AccountId uint64
+}

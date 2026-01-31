@@ -22,6 +22,7 @@ type Account interface {
 	GetAccountList(ctx context.Context, params GetAccountListParams) (GetAccountListOutput, error)
 
 	UpdateAccountInfo(ctx context.Context, params UpdateAccountInfoParams) (UpdateAccountInfoOutput, error)
+	UpdateAccountPassword(ctx context.Context, params UpdateAccountPasswordParams) (UpdateAccountPasswordOutput, error)
 
 	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
 	DeleteAccountByUsername(ctx context.Context, params DeleteAccountByUsernameParams) error
@@ -348,5 +349,30 @@ func (a account) UpdateAccountInfo(
 
 	return UpdateAccountInfoOutput{
 		AccountId: acc.Id,
+	}, nil
+}
+
+func (a account) UpdateAccountPassword(
+	ctx context.Context,
+	params UpdateAccountPasswordParams,
+) (UpdateAccountPasswordOutput, error) {
+	emptyObj := UpdateAccountPasswordOutput{}
+
+	hashedString, err := a.hashLogic.Hash(ctx, params.Password)
+	if err != nil {
+		return emptyObj, status.Error(codes.Internal, "failed to hash password")
+	}
+
+	err = a.accountPasswordAccessor.
+		UpdateAccountPassword(ctx, database.AccountPassword{
+			OfAccountId:  params.AccountId,
+			HashedString: hashedString,
+		})
+	if err != nil {
+		return emptyObj, status.Error(codes.Internal, "failed to update account password")
+	}
+
+	return UpdateAccountPasswordOutput{
+		AccountId: params.AccountId,
 	}, nil
 }

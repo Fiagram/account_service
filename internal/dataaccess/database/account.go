@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -81,9 +82,12 @@ func (a accountAccessor) CreateAccount(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return 0, err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return 0, errors.New(errMsg)
 	}
 
 	lastInsertedId, err := result.LastInsertId()
@@ -170,9 +174,12 @@ func (a accountAccessor) DeleteAccount(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil
@@ -195,9 +202,12 @@ func (a accountAccessor) DeleteAccountByUsername(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil
@@ -232,9 +242,12 @@ func (a accountAccessor) UpdateAccount(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil
