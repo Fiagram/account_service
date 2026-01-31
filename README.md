@@ -9,7 +9,6 @@
     - [Database migration](#database-migration)
 - [Testing](#testing)
 - [Deployment](#deployment)
-- [Contributors](#contributors)
 
 
 # Todo list
@@ -58,10 +57,3 @@ make test
 ```
 make docker-compose-up-test
 ```
-
-# Contributors
-|  Fullname   | Startdate  |
-| :---------: | :--------: |
-| Vũ Đức Thái | 01/01/2026 |
-
-
