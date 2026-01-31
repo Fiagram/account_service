@@ -26,7 +26,7 @@ func TestCreateAndDeleteAccountPassword(t *testing.T) {
 	require.NoError(t, pAsor.CreateAccountPassword(ctx, input))
 
 	require.NoError(t, pAsor.DeleteAccountPassword(ctx, id))
-	require.NoError(t, aAsor.DeleteAccountById(ctx, id))
+	require.NoError(t, aAsor.DeleteAccount(ctx, id))
 }
 
 func TestGetAccountPassword(t *testing.T) {
@@ -51,7 +51,7 @@ func TestGetAccountPassword(t *testing.T) {
 	require.Equal(t, input.HashedString, output.HashedString)
 
 	require.NoError(t, pAsor.DeleteAccountPassword(ctx, id))
-	require.NoError(t, aAsor.DeleteAccountById(ctx, id))
+	require.NoError(t, aAsor.DeleteAccount(ctx, id))
 }
 
 func TestUpdateAccountPassword(t *testing.T) {
@@ -81,5 +81,5 @@ func TestUpdateAccountPassword(t *testing.T) {
 	require.Equal(t, updatedInput.HashedString, output.HashedString)
 
 	require.NoError(t, pAsor.DeleteAccountPassword(ctx, id))
-	require.NoError(t, aAsor.DeleteAccountById(ctx, id))
+	require.NoError(t, aAsor.DeleteAccount(ctx, id))
 }

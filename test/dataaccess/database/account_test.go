@@ -28,7 +28,7 @@ func TestGetAccountById(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	acc, err := aAsor.GetAccountById(context.Background(), id)
+	acc, err := aAsor.GetAccount(context.Background(), id)
 	require.NoError(t, err)
 	require.NotEmpty(t, acc)
 	require.Equal(t, input.Username, acc.Username)
@@ -68,7 +68,7 @@ func TestDeleteAccountById(t *testing.T) {
 	require.NoError(t, err)
 	require.NotEmpty(t, id)
 
-	errD := aAsor.DeleteAccountById(context.Background(), id)
+	errD := aAsor.DeleteAccount(context.Background(), id)
 	require.NoError(t, errD)
 }
 
