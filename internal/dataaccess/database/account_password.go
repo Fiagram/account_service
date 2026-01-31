@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"time"
 
@@ -65,9 +66,12 @@ func (a accountPasswordAccessor) CreateAccountPassword(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil
@@ -118,9 +122,12 @@ func (a accountPasswordAccessor) DeleteAccountPassword(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil
@@ -148,9 +155,12 @@ func (a accountPasswordAccessor) UpdateAccountPassword(
 	}
 
 	rowEfNum, err := result.RowsAffected()
-	if rowEfNum != 1 && err != nil {
-		logger.With(zap.Error(err)).Error("failed to effect row")
-		return err
+	if rowEfNum != 1 || err != nil {
+		errMsg := "failed to effect row"
+		logger.With(zap.Int64("rowEfNum", rowEfNum)).
+			With(zap.Error(err)).
+			Error(errMsg)
+		return errors.New(errMsg)
 	}
 
 	return nil

@@ -7,5 +7,5 @@ import (
 
 var (
 	ErrTxCommitFailed = status.Error(codes.Internal, "failed to commit")
-	ErrTxInitFailed   = status.Error(codes.Internal, "failed to take a transaction up")
+	ErrTxBeginFailed  = status.Error(codes.Internal, "failed to take a transaction up")
 )

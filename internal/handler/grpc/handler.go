@@ -184,6 +184,23 @@ func (h Handler) UpdateAccount(
 	}, nil
 }
 
+func (h Handler) DeleteAccount(
+	ctx context.Context,
+	request *account_service.DeleteAccountRequest,
+) (*account_service.DeleteAccountResponse, error) {
+	err := h.accountLogic.DeleteAccount(ctx,
+		logic.DeleteAccountParams{
+			AccountId: request.AccountId,
+		})
+	if err != nil {
+		return nil, err
+	}
+
+	return &account_service.DeleteAccountResponse{
+		AccountId: request.AccountId,
+	}, nil
+}
+
 func (h Handler) DeleteAccountByUsername(
 	ctx context.Context,
 	request *account_service.DeleteAccountByUsernameRequest,

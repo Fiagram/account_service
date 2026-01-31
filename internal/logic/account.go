@@ -12,13 +12,19 @@ import (
 
 type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
-	DeleteAccountByUsername(ctx context.Context, params DeleteAccountByUsernameParams) error
+
 	CheckAccountValid(ctx context.Context, params CheckAccountValidParams) (CheckAccountValidOutput, error)
+
 	IsUsernameTaken(ctx context.Context, params IsUsernameTakenParams) (IsUsernameTakenOutput, error)
+
 	GetAccount(ctx context.Context, params GetAccountParams) (GetAccountOutput, error)
 	GetAccountAll(ctx context.Context, params GetAccountAllParams) (GetAccountAllOutput, error)
 	GetAccountList(ctx context.Context, params GetAccountListParams) (GetAccountListOutput, error)
+
 	UpdateAccount(ctx context.Context, params UpdateAccountParams) (UpdateAccountOutput, error)
+
+	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
+	DeleteAccountByUsername(ctx context.Context, params DeleteAccountByUsernameParams) error
 }
 
 type account struct {
@@ -59,7 +65,7 @@ func (a account) CreateAccount(
 
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return emptyOutput, ErrTxInitFailed
+		return emptyOutput, ErrTxBeginFailed
 	}
 	defer tx.Rollback()
 
@@ -100,6 +106,36 @@ func (a account) CreateAccount(
 	}, nil
 }
 
+func (a account) DeleteAccount(
+	ctx context.Context,
+	params DeleteAccountParams,
+) error {
+	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
+	if err != nil {
+		return ErrTxBeginFailed
+	}
+	defer tx.Rollback()
+
+	err = a.accountPasswordAccessor.
+		WithExecutor(tx).
+		DeleteAccountPassword(ctx, params.AccountId)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to delete password")
+	}
+	err = a.accountAccessor.
+		WithExecutor(tx).
+		DeleteAccount(ctx, params.AccountId)
+	if err != nil {
+		return status.Error(codes.Internal, "failed to delete account")
+	}
+
+	if err = tx.Commit(); err != nil {
+		return ErrTxCommitFailed
+	}
+
+	return nil
+}
+
 func (a account) DeleteAccountByUsername(
 	ctx context.Context,
 	params DeleteAccountByUsernameParams,
@@ -113,7 +149,7 @@ func (a account) DeleteAccountByUsername(
 
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return ErrTxInitFailed
+		return ErrTxBeginFailed
 	}
 	defer tx.Rollback()
 	acc, err := a.accountAccessor.
@@ -277,7 +313,7 @@ func (a account) UpdateAccount(
 
 	tx, err := a.db.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return emptyObj, ErrTxInitFailed
+		return emptyObj, ErrTxBeginFailed
 	}
 	defer tx.Rollback()
 
