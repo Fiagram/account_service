@@ -25,7 +25,7 @@ type CreateAccountOutput struct {
 	AccountId uint64
 }
 
-type DeleteAccountParams struct {
+type DeleteAccountByUsernameParams struct {
 	Username string
 }
 

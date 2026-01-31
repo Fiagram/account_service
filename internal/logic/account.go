@@ -12,7 +12,7 @@ import (
 
 type Account interface {
 	CreateAccount(ctx context.Context, params CreateAccountParams) (CreateAccountOutput, error)
-	DeleteAccount(ctx context.Context, params DeleteAccountParams) error
+	DeleteAccountByUsername(ctx context.Context, params DeleteAccountByUsernameParams) error
 	CheckAccountValid(ctx context.Context, params CheckAccountValidParams) (CheckAccountValidOutput, error)
 	IsUsernameTaken(ctx context.Context, params IsUsernameTakenParams) (IsUsernameTakenOutput, error)
 	GetAccount(ctx context.Context, params GetAccountParams) (GetAccountOutput, error)
@@ -100,9 +100,9 @@ func (a account) CreateAccount(
 	}, nil
 }
 
-func (a account) DeleteAccount(
+func (a account) DeleteAccountByUsername(
 	ctx context.Context,
-	params DeleteAccountParams,
+	params DeleteAccountByUsernameParams,
 ) error {
 	isExisted, err := a.accountAccessor.IsUsernameTaken(ctx, params.Username)
 	if err != nil {
@@ -130,7 +130,7 @@ func (a account) DeleteAccount(
 	}
 	err = a.accountAccessor.
 		WithExecutor(tx).
-		DeleteAccountById(ctx, acc.Id)
+		DeleteAccount(ctx, acc.Id)
 	if err != nil {
 		return status.Error(codes.Internal, "failed to delete account")
 	}
@@ -192,7 +192,7 @@ func (a account) GetAccount(
 	params GetAccountParams,
 ) (GetAccountOutput, error) {
 	emptyObj := GetAccountOutput{}
-	acc, err := a.accountAccessor.GetAccountById(ctx, params.AccountId)
+	acc, err := a.accountAccessor.GetAccount(ctx, params.AccountId)
 	if err != nil {
 		return emptyObj, status.Error(codes.NotFound, "failed to get account")
 	}
@@ -283,7 +283,7 @@ func (a account) UpdateAccount(
 
 	acc, err := a.accountAccessor.
 		WithExecutor(tx).
-		GetAccountById(ctx, params.AccountId)
+		GetAccount(ctx, params.AccountId)
 	if err != nil {
 		return emptyObj, status.Error(codes.NotFound, "account not found")
 	}

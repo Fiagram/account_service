@@ -184,19 +184,19 @@ func (h Handler) UpdateAccount(
 	}, nil
 }
 
-func (h Handler) DeleteAccount(
+func (h Handler) DeleteAccountByUsername(
 	ctx context.Context,
-	request *account_service.DeleteAccountRequest,
-) (*account_service.DeleteAccountResponse, error) {
-	err := h.accountLogic.DeleteAccount(ctx,
-		logic.DeleteAccountParams{
+	request *account_service.DeleteAccountByUsernameRequest,
+) (*account_service.DeleteAccountByUsernameResponse, error) {
+	err := h.accountLogic.DeleteAccountByUsername(ctx,
+		logic.DeleteAccountByUsernameParams{
 			Username: request.GetUsername(),
 		})
 	if err != nil {
 		return nil, err
 	}
 
-	return &account_service.DeleteAccountResponse{
+	return &account_service.DeleteAccountByUsernameResponse{
 		Username: request.GetUsername(),
 	}, nil
 }

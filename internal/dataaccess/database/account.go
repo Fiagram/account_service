@@ -24,12 +24,12 @@ type Account struct {
 type AccountAccessor interface {
 	CreateAccount(ctx context.Context, account Account) (uint64, error)
 
-	GetAccountById(ctx context.Context, id uint64) (Account, error)
+	GetAccount(ctx context.Context, id uint64) (Account, error)
 	GetAccountByUsername(ctx context.Context, username string) (Account, error)
 
 	UpdateAccount(ctx context.Context, account Account) error
 
-	DeleteAccountById(ctx context.Context, id uint64) error
+	DeleteAccount(ctx context.Context, id uint64) error
 	DeleteAccountByUsername(ctx context.Context, username string) error
 
 	IsUsernameTaken(ctx context.Context, username string) (bool, error)
@@ -95,7 +95,7 @@ func (a accountAccessor) CreateAccount(
 	return uint64(lastInsertedId), nil
 }
 
-func (a accountAccessor) GetAccountById(
+func (a accountAccessor) GetAccount(
 	ctx context.Context,
 	id uint64,
 ) (Account, error) {
@@ -153,7 +153,7 @@ func (a accountAccessor) GetAccountByUsername(
 	return out, nil
 }
 
-func (a accountAccessor) DeleteAccountById(
+func (a accountAccessor) DeleteAccount(
 	ctx context.Context,
 	id uint64,
 ) error {
